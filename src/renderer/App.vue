@@ -10,6 +10,7 @@
   }
 </script>
 
-<style>
+<style lang="scss">
   @import '~@/assets/normalize.css';
+  @import '~@/assets/style.scss';
 </style>

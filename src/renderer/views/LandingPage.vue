@@ -58,22 +58,6 @@
 </script>
 
 <style lang="scss">
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: sans-serif;
-  }
-  p {
-    margin-bottom: 1em;
-  }
-  hr {
-    margin: 2em 0;
-    border-width: 0;
-    border-top: 1px solid #E1E1E1;
-  }
-
   #wrapper {
     background:
       radial-gradient(
