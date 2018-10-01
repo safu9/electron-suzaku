@@ -6,7 +6,7 @@
       <hr>
 
       <div class="clearfix" v-if="currentData">
-        <img id="artwork" :src="currentData.picture || '/static/blank.png'" />
+        <img id="artwork" :src="currentData.picture || 'static/blank.png'" />
         <p id="song-title">{{ currentData.title || currentData.filename }}</p>
         <p>
           <span v-show="currentData.album">{{ currentData.album }}</span>
