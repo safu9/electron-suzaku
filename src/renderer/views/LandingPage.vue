@@ -1,25 +1,43 @@
 <template>
   <div id="wrapper">
-    <img id="logo" src="~@/assets/logo.png" alt="electron-vue">
     <main id="main">
       <div id="title">Suzaku</div>
-      <p>
-        A simple cross-platform music player &amp; library manager
-      </p>
-      <hr>
-      <p><button @click="openFile">Open file</button></p>
 
-      <button @click="togglePlay"><SvgIcon :icon="isPlaying ? 'pause' : 'play'"></SvgIcon></button>
-      <p>{{ metadata.title || filePath }}<span v-show="metadata.artist"> / {{ metadata.artist }}</span></p>
-      <p><img :src="metadata.picture" /></p>
+      <hr>
+
+      <div class="clearfix" v-if="currentData">
+        <img id="artwork" :src="currentData.picture || '/static/blank.png'" />
+        <p id="song-title">{{ currentData.title || currentData.filename }}</p>
+        <p>
+          <span v-show="currentData.album">{{ currentData.album }}</span>
+          <span v-show="currentData.album && currentData.artist">/</span>
+          <span v-show="currentData.artist">{{ currentData.artist }}</span>
+        </p>
+      </div>
+
+      <p id="controls">
+        <button id="prev-button" @click="prevSong"><SvgIcon icon="skip-backward"></SvgIcon></button>
+        <button id="play-button" @click="togglePlay"><SvgIcon :icon="isPlaying ? 'pause' : 'play'"></SvgIcon></button>
+        <button id="next-button" @click="nextSong"><SvgIcon icon="skip-forward"></SvgIcon></button>
+
+        <button id="folder-button" @click="selectFolder">Open Folder</button>
+      </p>
+
+      <hr>
+
+      <div>
+        <p v-for="(data, i) in files" :key="data.path" class="listitem" @click="switchSong(i)">
+          <span v-if="i == index" class="item-index item-index-playing"><SvgIcon :icon="isPlaying ? 'play' : 'pause'"></SvgIcon></span>
+          <span v-else class="item-index">{{ data.track.no || i+1 }}</span>
+          <span class="item-name">{{ data.title || data.filename }}</span>
+        </p>
+      </div>
     </main>
   </div>
 </template>
 
 <script>
   import SvgIcon from '@/components/SvgIcon'
-
-  const mm = require('music-metadata')
 
   export default {
     name: 'landing-page',
@@ -28,47 +46,45 @@
     },
     data () {
       return {
-        filePath: '',
-        metadata: {},
+        files: [],
+        index: 0,
         currentSong: null,
         isPlaying: false,
         audioContext: null
       }
     },
-    mounted () {
-      this.audioContext = new AudioContext()
-    },
-    beforeDestroy () {
-      if (this.audioContext) {
-        this.audioContext.close()
+    computed: {
+      currentData () {
+        return this.files[this.index]
       }
     },
+    mounted () {
+      this.audioContext = new AudioContext()
+
+      this.$electron.ipcRenderer.on('selected_folder', (_event, arg) => {
+        this.onFolderSelected(arg)
+      })
+    },
     methods: {
-      openFile () {
-        this.$electron.remote.dialog.showOpenDialog({
-          properties: ['openFile', 'createDirectory']
-        }, this.onFileSelected)
+      selectFolder () {
+        this.$electron.ipcRenderer.send('select_folder')
       },
-      onFileSelected (files) {
+      onFolderSelected (files) {
         if (!files) {
           return
         }
 
-        this.filePath = files[0]
+        this.files = files
+        this.index = 0
 
-        mm.parseFile(this.filePath, {native: true})
-          .then(metadata => {
-            if (metadata.common.picture) {
-              let pic = metadata.common.picture[0]
-              metadata.common.picture = 'data:' + pic.format + ';base64,' + pic.data.toString('base64')
-            }
-
-            this.metadata = metadata.common
-          })
-          .catch(err => {
-            console.log(err.message)
-            this.metadata = {}
-          })
+        this.initPlayer()
+        this.togglePlay()
+      },
+      initPlayer () {
+        if (this.files.length < this.index - 1) {
+          return
+        }
+        const path = this.files[this.index].path
 
         if (this.currentSong) {
           this.currentSong.pause()
@@ -76,13 +92,13 @@
         }
 
         this.currentSong = new Audio()
-        this.currentSong.src = this.filePath
-        this.currentSong.onended = this.onPlayEnded
+        this.currentSong.src = path
+        this.currentSong.onended = this.nextSong
+
+        this.isPlaying = false
 
         let source = this.audioContext.createMediaElementSource(this.currentSong)
         source.connect(this.audioContext.destination)
-
-        this.togglePlay()
       },
       togglePlay () {
         if (!this.currentSong) {
@@ -102,8 +118,23 @@
 
         this.isPlaying = !this.currentSong.paused
       },
-      onPlayEnded () {
-        this.isPlaying = false
+      switchSong (index) {
+        if (index < 0 || this.files.length < index - 1) {
+          if (this.currentSong && !this.currentSong.paused) {
+            this.currentSong.pause()
+            this.isPlaying = false
+          }
+          return
+        }
+        this.index = index
+        this.initPlayer()
+        this.togglePlay()
+      },
+      nextSong () {
+        this.switchSong(this.index + 1)
+      },
+      prevSong () {
+        this.switchSong(this.index - 1)
       }
     }
   }
@@ -131,16 +162,79 @@
   }
 
   #main button {
-    font-size: .8em;
-    cursor: pointer;
-    outline: none;
-    padding: 0.75em 2em;
-    border-radius: 2em;
     display: inline-block;
+    padding: 0.75em 2em;
+    border: 1px solid #4fc08d;
+    border-radius: 2em;
+    outline: none;
     color: #fff;
     background-color: #4fc08d;
-    transition: all 0.15s ease;
-    box-sizing: border-box;
-    border: 1px solid #4fc08d;
+    cursor: pointer;
+  }
+
+  #artwork {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+    object-fit: contain;
+    float: left;
+  }
+
+  #song-title {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  #controls {
+    button {
+      padding: .75em !important;
+    }
+    .icon {
+      width: 1.5em;
+      height: 1.5em;
+    }
+
+    #play-button .icon {
+      fill: #fff;
+    }
+
+    #prev-button,
+    #next-button {
+      background: none;
+
+      .icon {
+        fill: #4fc08d;
+      }
+    }
+
+    #folder-button {
+      float: right;
+    }
+  }
+
+  .listitem {
+    margin: 0 -10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color .2s ease;
+    font-size: 16px;
+    line-height: 22px;
+    &:hover {
+      background-color: rgba(0, 0, 0, .03);
+    }
+
+    .item-index {
+      display: inline-block;
+      width: 2em;
+      padding-right: .5em;
+      text-align: right;
+
+      &-playing {
+        padding-right: .2em;
+      }
+    }
+    .item-name {
+      vertical-align: middle;
+    }
   }
 </style>

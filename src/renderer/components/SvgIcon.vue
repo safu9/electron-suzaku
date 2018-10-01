@@ -10,9 +10,8 @@
 
 <style>
 .icon {
-  width: 1.5em;
-  height: 1.5em;
+  width: 1em;
+  height: 1em;
   vertical-align: middle;
-  fill: #fff;
 }
 </style>

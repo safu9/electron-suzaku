@@ -1,6 +1,10 @@
 'use strict'
 
-import { app, BrowserWindow, Menu } from 'electron'
+import { app, dialog, ipcMain, BrowserWindow, Menu } from 'electron'
+
+const fs = require('fs')
+const path = require('path')
+const mm = require('music-metadata')
 
 const isDevelopment = (process.env.NODE_ENV === 'development')
 
@@ -41,8 +45,9 @@ function createWindow () {
       label: 'File',
       submenu: [
         {
-          label: 'Open File',
-          accelerator: 'CmdOrCtrl + O'
+          label: 'Open Folder',
+          accelerator: 'CmdOrCtrl + O',
+          click: openFolder
         },
         {
           type: 'separator'
@@ -92,6 +97,49 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+ipcMain.on('select_folder', openFolder)
+
+function openFolder () {
+  dialog.showOpenDialog({ properties: ['openDirectory'] }, dirs => {
+    if (dirs) {
+      fs.readdir(dirs[0], async (_err, files) => {
+        const supportedExt = ['.mp3', '.aac', '.m4a', '.3gp', '.ogg', '.opus', '.flac', '.wav']
+
+        const arg = await Promise.all(
+          files
+            .filter(file => {
+              const ext = path.extname(file).toLowerCase()
+              return supportedExt.includes(ext)
+            })
+            .map(async (filename) => {
+              const filePath = path.join(dirs[0], filename)
+              let data = {}
+
+              try {
+                const metadata = await mm.parseFile(filePath, {native: true})
+
+                if (metadata.common.picture) {
+                  let pic = metadata.common.picture[0]
+                  metadata.common.picture = 'data:' + pic.format + ';base64,' + pic.data.toString('base64')
+                }
+
+                data = metadata.common
+              } catch (err) {
+                console.log(err.message)
+              }
+
+              data.path = filePath
+              data.filename = filename
+              return data
+            })
+        )
+
+        mainWindow.webContents.send('selected_folder', arg)
+      })
+    }
+  })
+}
 
 /**
  * Auto Updater
