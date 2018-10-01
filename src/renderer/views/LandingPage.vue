@@ -9,24 +9,41 @@
       <hr>
       <p><button @click="openFile">Open file</button></p>
 
-      <p>{{filePath}}</p>
+      <div v-show="metadata.title">
+        <button @click="togglePlay"><SvgIcon :icon="isPlaying ? 'pause' : 'play'"></SvgIcon></button>
+        <p>{{ metadata.title }} / {{ metadata.artist }}</p>
+        <p><img :src="metadata.picture" /></p>
+      </div>
     </main>
   </div>
 </template>
 
 <script>
+  import SvgIcon from '@/components/SvgIcon'
+
+  const mm = require('music-metadata')
+
   export default {
     name: 'landing-page',
-    components: {},
+    components: {
+      SvgIcon
+    },
     data () {
       return {
         filePath: '',
+        metadata: {},
         currentSong: null,
+        isPlaying: false,
         audioContext: null
       }
     },
     mounted () {
       this.audioContext = new AudioContext()
+    },
+    beforeDestroy () {
+      if (this.audioContext) {
+        this.audioContext.close()
+      }
     },
     methods: {
       openFile () {
@@ -41,6 +58,17 @@
 
         this.filePath = files[0]
 
+        mm.parseFile(this.filePath, {native: true})
+          .then(metadata => {
+            let pic = metadata.common.picture[0]
+            metadata.common.picture = 'data:' + pic.format + ';base64,' + pic.data.toString('base64')
+
+            this.metadata = metadata.common
+          })
+          .catch(err => {
+            console.error(err.message)
+          })
+
         if (this.currentSong) {
           this.currentSong.pause()
         }
@@ -51,7 +79,16 @@
         let source = this.audioContext.createMediaElementSource(this.currentSong)
         source.connect(this.audioContext.destination)
 
-        this.currentSong.play()
+        this.togglePlay()
+      },
+      togglePlay () {
+        if (!this.currentSong.paused) {
+          this.currentSong.pause()
+        } else {
+          this.currentSong.play()
+        }
+
+        this.isPlaying = !this.currentSong.paused
       }
     }
   }
@@ -66,15 +103,9 @@
         rgba(229, 229, 229, .9) 100%
       );
     height: 100vh;
-    padding: 60px 80px;
+    padding: 40px 60px;
     width: 100vw;
-  }
-
-  #logo {
-    height: auto;
-    margin-bottom: 20px;
-    width: 420px;
-    max-width: 100%;
+    overflow-y: scroll;
   }
 
   #title {
