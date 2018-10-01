@@ -194,13 +194,25 @@
       height: 1.5em;
     }
 
-    #play-button .icon {
-      fill: #fff;
+    #play-button,
+    #folder-button {
+      transition: background-color .2s ease;
+      &:hover {
+        background-color: rgba(79,192,141,.85);
+      }
+
+      .icon {
+        fill: #fff;
+      }
     }
 
     #prev-button,
     #next-button {
       background: none;
+      transition: background-color .2s ease;
+      &:hover {
+        background-color: rgba(79,192,141,.1);
+      }
 
       .icon {
         fill: #4fc08d;
