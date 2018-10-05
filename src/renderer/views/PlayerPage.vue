@@ -42,7 +42,7 @@
   import SvgIcon from '@/components/SvgIcon'
 
   export default {
-    name: 'landing-page',
+    name: 'player-page',
     components: {
       SvgIcon
     },
