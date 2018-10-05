@@ -15,6 +15,15 @@
         </p>
       </div>
 
+      <div class="clearfix">
+        <Seekbar color="#4fc08d"
+          :max="currentFile ? Math.round(currentFile.duration) : 0"
+          :value="time"
+          @change="seekSong" />
+        <div id="current-time">{{ timeString }} / {{ durationString }}</div>
+        <div id="current-index">{{ files.length ? index+1 : 0 }} / {{ files.length }}</div>
+      </div>
+
       <p id="controls">
         <button id="prev-button" @click="prevSong"><SvgIcon icon="skip-backward"></SvgIcon></button>
         <button id="play-button" @click="togglePlay"><SvgIcon :icon="isPlaying ? 'pause' : 'play'"></SvgIcon></button>
@@ -39,11 +48,13 @@
 </template>
 
 <script>
+import Seekbar from '@/components/Seekbar'
 import SvgIcon from '@/components/SvgIcon'
 
 export default {
   name: 'player-page',
   components: {
+    Seekbar,
     SvgIcon
   },
   data () {
@@ -51,6 +62,8 @@ export default {
       files: [],
       index: 0,
       audio: null,
+      time: 0,
+      timeIntervalID: null,
       isPlaying: false,
       isRepeating: false,
       isShuffling: false,
@@ -65,6 +78,19 @@ export default {
     },
     currentFile () {
       return this.files[this.currentIndex]
+    },
+    timeString () {
+      const min = Math.floor(this.time / 60)
+      const sec = this.time % 60
+      return min + ':' + (sec < 10 ? '0' : '') + sec
+    },
+    durationString () {
+      if (!this.currentFile) {
+        return '0:00'
+      }
+      const min = Math.floor(this.currentFile.duration / 60)
+      const sec = Math.round(this.currentFile.duration) % 60
+      return min + ':' + (sec < 10 ? '0' : '') + sec
     }
   },
   mounted () {
@@ -123,6 +149,8 @@ export default {
 
       if (!this.audio.paused) {
         this.audio.pause()
+
+        window.clearInterval(this.timeIntervalID)
       } else {
         this.audio.play()
           .catch(err => {
@@ -130,6 +158,8 @@ export default {
             this.audio = null
             this.isPlaying = false
           })
+
+        this.timeIntervalID = window.setInterval(this.updateSeekbar, 200)
       }
 
       this.isPlaying = !this.audio.paused
@@ -201,6 +231,18 @@ export default {
       this.shuffleList[0] = this.index
 
       this.index = 0
+    },
+    updateSeekbar () {
+      if (this.audio) {
+        this.time = Math.round(this.audio.currentTime)
+      } else {
+        this.time = 0
+      }
+    },
+    seekSong (val) {
+      if (this.audio) {
+        this.audio.currentTime = val
+      }
     }
   }
 }
@@ -238,6 +280,17 @@ export default {
 #song-title {
   font-size: 1.2em;
   font-weight: bold;
+}
+
+#current-time {
+  float: right;
+  font-size: .6em;
+  color: #777;
+}
+#current-index {
+  float: left;
+  font-size: .6em;
+  color: #777;
 }
 
 #controls {

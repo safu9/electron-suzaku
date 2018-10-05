@@ -124,7 +124,7 @@ function openFolder () {
                   metadata.common.picture = 'data:' + pic.format + ';base64,' + pic.data.toString('base64')
                 }
 
-                data = metadata.common
+                data = Object.assign(metadata.common, metadata.format)
               } catch (err) {
                 console.log(err.message)
               }
