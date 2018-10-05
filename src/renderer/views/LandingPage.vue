@@ -5,13 +5,13 @@
 
       <hr>
 
-      <div class="clearfix" v-if="currentData">
-        <img id="artwork" :src="currentData.picture || 'static/blank.png'" />
-        <p id="song-title">{{ currentData.title || currentData.filename }}</p>
+      <div class="clearfix" v-if="currentFile">
+        <img id="artwork" :src="currentFile.picture || 'static/blank.png'" />
+        <p id="song-title">{{ currentFile.title || currentFile.filename }}</p>
         <p>
-          <span v-show="currentData.album">{{ currentData.album }}</span>
-          <span v-show="currentData.album && currentData.artist">/</span>
-          <span v-show="currentData.artist">{{ currentData.artist }}</span>
+          <span v-show="currentFile.album">{{ currentFile.album }}</span>
+          <span v-show="currentFile.album && currentFile.artist">/</span>
+          <span v-show="currentFile.artist">{{ currentFile.artist }}</span>
         </p>
       </div>
 
@@ -19,6 +19,8 @@
         <button id="prev-button" @click="prevSong"><SvgIcon icon="skip-backward"></SvgIcon></button>
         <button id="play-button" @click="togglePlay"><SvgIcon :icon="isPlaying ? 'pause' : 'play'"></SvgIcon></button>
         <button id="next-button" @click="nextSong"><SvgIcon icon="skip-forward"></SvgIcon></button>
+        <button id="repeat-button" @click="toggleRepeat" :class="{'off': !isRepeating}"><SvgIcon :icon="(isRepeating === 'one') ? 'repeat-one' : 'repeat'"></SvgIcon></button>
+        <button id="shuffle-button" @click="toggleShuffle" :class="{'off': !isShuffling}"><SvgIcon icon="shuffle"></SvgIcon></button>
 
         <button id="folder-button" @click="selectFolder">Open Folder</button>
       </p>
@@ -26,8 +28,8 @@
       <hr>
 
       <div>
-        <p v-for="(data, i) in files" :key="data.path" class="listitem" @click="switchSong(i)">
-          <span v-if="i == index" class="item-index item-index-playing"><SvgIcon :icon="isPlaying ? 'play' : 'pause'"></SvgIcon></span>
+        <p v-for="(data, i) in files" :key="data.path" class="listitem" @click="setCurrentIndex(i)">
+          <span v-if="i == currentIndex" class="item-index item-index-playing"><SvgIcon :icon="isPlaying ? 'play' : 'pause'"></SvgIcon></span>
           <span v-else class="item-index">{{ data.track.no || i+1 }}</span>
           <span class="item-name">{{ data.title || data.filename }}</span>
         </p>
@@ -48,14 +50,21 @@
       return {
         files: [],
         index: 0,
-        currentSong: null,
+        audio: null,
         isPlaying: false,
+        isRepeating: false,
+        isShuffling: false,
+        shuffleList: [],
         audioContext: null
       }
     },
     computed: {
-      currentData () {
-        return this.files[this.index]
+      // Shuffled index and file
+      currentIndex () {
+        return this.isShuffling ? this.shuffleList[this.index] : this.index
+      },
+      currentFile () {
+        return this.files[this.currentIndex]
       }
     },
     mounted () {
@@ -81,60 +90,113 @@
         this.togglePlay()
       },
       initPlayer () {
-        if (this.files.length < this.index - 1) {
+        if (!this.currentFile) {
           return
         }
-        const path = this.files[this.index].path
+        const path = this.currentFile.path
 
-        if (this.currentSong) {
-          this.currentSong.pause()
-          this.currentSong = null
+        if (this.audio) {
+          this.audio.pause()
+          this.audio = null
         }
 
-        this.currentSong = new Audio()
-        this.currentSong.src = path
-        this.currentSong.onended = this.nextSong
+        this.audio = new Audio()
+        this.audio.src = path
+        this.audio.onended = this.onSongEnded
 
         this.isPlaying = false
 
-        let source = this.audioContext.createMediaElementSource(this.currentSong)
+        let source = this.audioContext.createMediaElementSource(this.audio)
         source.connect(this.audioContext.destination)
       },
+      onSongEnded () {
+        if (this.isRepeating === 'one') {
+          this.audio.play()
+        } else {
+          this.nextSong()
+        }
+      },
       togglePlay () {
-        if (!this.currentSong) {
+        if (!this.audio) {
           return
         }
 
-        if (!this.currentSong.paused) {
-          this.currentSong.pause()
+        if (!this.audio.paused) {
+          this.audio.pause()
         } else {
-          this.currentSong.play()
+          this.audio.play()
             .catch(err => {
               console.log(err)
-              this.currentSong = null
+              this.audio = null
               this.isPlaying = false
             })
         }
 
-        this.isPlaying = !this.currentSong.paused
+        this.isPlaying = !this.audio.paused
       },
-      switchSong (index) {
-        if (index < 0 || this.files.length < index - 1) {
-          if (this.currentSong && !this.currentSong.paused) {
-            this.currentSong.pause()
-            this.isPlaying = false
+      setIndex (index) {
+        if (index < 0 || this.files.length <= index) {
+          if (this.isRepeating === true) {
+            index = (index + this.files.length) % this.files.length
+            if (this.isShuffling) {
+              this.updateShuffleList()
+            }
+          } else {
+            if (this.audio && !this.audio.paused) {
+              this.audio.pause()
+              this.isPlaying = false
+            }
+            return
           }
-          return
         }
         this.index = index
         this.initPlayer()
         this.togglePlay()
       },
+      setCurrentIndex (index) {
+        index = this.isShuffling ? this.shuffleList.indexOf(index) : index
+        this.setIndex(index)
+      },
       nextSong () {
-        this.switchSong(this.index + 1)
+        this.setIndex(this.index + 1)
       },
       prevSong () {
-        this.switchSong(this.index - 1)
+        this.setIndex(this.index - 1)
+      },
+      toggleRepeat () {
+        if (this.isRepeating === true) {
+          this.isRepeating = 'one'
+        } else if (this.isRepeating === 'one') {
+          this.isRepeating = false
+        } else {
+          this.isRepeating = true
+        }
+      },
+      toggleShuffle () {
+        this.isShuffling = !this.isShuffling
+
+        if (this.isShuffling) {
+          this.updateShuffleList()
+        } else {
+          this.index = this.shuffleList[this.index]
+          this.shuffleList = []
+        }
+      },
+      updateShuffleList () {
+        this.shuffleList = [...Array(this.files.length).keys()]
+
+        for (var i = this.shuffleList.length - 1; i > 0; i--) {
+          const r = Math.floor(Math.random() * (i + 1))
+          const tmp = this.shuffleList[i]
+          this.shuffleList[i] = this.shuffleList[r]
+          this.shuffleList[r] = tmp
+        }
+
+        // Set new index
+        this.shuffleList[this.shuffleList.indexOf(this.index)] = this.shuffleList[0]
+        this.shuffleList[0] = this.index
+
+        this.index = 0
       }
     }
   }
@@ -161,17 +223,6 @@
     margin-bottom: 6px;
   }
 
-  #main button {
-    display: inline-block;
-    padding: 0.75em 2em;
-    border: 1px solid #4fc08d;
-    border-radius: 2em;
-    outline: none;
-    color: #fff;
-    background-color: #4fc08d;
-    cursor: pointer;
-  }
-
   #artwork {
     width: 100px;
     height: 100px;
@@ -187,35 +238,40 @@
 
   #controls {
     button {
-      padding: .75em !important;
+      display: inline-block;
+      padding: 0.75em;
+      border: 1px solid #4fc08d;
+      border-radius: 2em;
+      outline: none;
+      color: #fff;
+      cursor: pointer;
+      background: none;
+      transition: background-color .2s ease;
+      &:hover {
+        background-color: rgba(79,192,141,.1);
+      }
+      &.off {
+        border-color: #ccc;
+        .icon {
+          fill: #ccc;
+        }
+      }
     }
     .icon {
       width: 1.5em;
       height: 1.5em;
+      fill: #4fc08d;
     }
 
     #play-button,
     #folder-button {
-      transition: background-color .2s ease;
+      background-color: #4fc08d;
       &:hover {
         background-color: rgba(79,192,141,.85);
       }
 
       .icon {
         fill: #fff;
-      }
-    }
-
-    #prev-button,
-    #next-button {
-      background: none;
-      transition: background-color .2s ease;
-      &:hover {
-        background-color: rgba(79,192,141,.1);
-      }
-
-      .icon {
-        fill: #4fc08d;
       }
     }
 
@@ -240,6 +296,7 @@
       width: 2em;
       padding-right: .5em;
       text-align: right;
+      vertical-align: middle;
 
       &-playing {
         padding-right: .2em;
