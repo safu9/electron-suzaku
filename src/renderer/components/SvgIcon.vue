@@ -3,9 +3,9 @@
 </template>
 
 <script>
-  export default {
-    props: ['icon']
-  }
+export default {
+  props: ['icon']
+}
 </script>
 
 <style>

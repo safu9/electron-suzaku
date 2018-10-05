@@ -5,12 +5,12 @@
 </template>
 
 <script>
-  export default {
-    name: 'suzaku'
-  }
+export default {
+  name: 'suzaku'
+}
 </script>
 
 <style lang="scss">
-  @import '~@/assets/normalize.css';
-  @import '~@/assets/style.scss';
+@import '~@/assets/normalize.css';
+@import '~@/assets/style.scss';
 </style>
