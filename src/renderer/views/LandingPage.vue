@@ -142,7 +142,7 @@
               this.updateShuffleList()
             }
           } else {
-            if (this.audio && !this.audio.paused) {
+            if (this.audio && this.isPlaying) {
               this.audio.pause()
               this.isPlaying = false
             }
@@ -150,8 +150,12 @@
           }
         }
         this.index = index
+
+        const wasPlaying = this.isPlaying
         this.initPlayer()
-        this.togglePlay()
+        if (wasPlaying) {
+          this.togglePlay()
+        }
       },
       setCurrentIndex (index) {
         index = this.isShuffling ? this.shuffleList.indexOf(index) : index
