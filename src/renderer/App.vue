@@ -13,4 +13,9 @@ export default {
 <style lang="scss">
 @import '~@/assets/normalize.css';
 @import '~@/assets/style.scss';
+
+#app {
+  width: 100vw;
+  height: 100vh;
+}
 </style>

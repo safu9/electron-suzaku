@@ -1,13 +1,11 @@
 <template>
-  <div id="wrapper">
-    <main id="main">
-      <div id="title">Suzaku</div>
+  <div id="main">
+    <div id="library">
+      <div class="clearfix">
+        <button id="folder-button" @click="selectFolder">Open Folder</button>
 
-      <hr>
-
-      <div class="clearfix" v-if="currentFile">
         <img id="artwork" :src="currentFile.picture || 'static/blank.png'" />
-        <p id="song-title">{{ currentFile.title || currentFile.filename }}</p>
+        <p id="song-title">{{ currentFile.title || currentFile.filename || 'Suzaku' }}</p>
         <p>
           <span v-show="currentFile.album">{{ currentFile.album }}</span>
           <span v-show="currentFile.album && currentFile.artist">/</span>
@@ -15,35 +13,31 @@
         </p>
       </div>
 
-      <div class="clearfix">
-        <Seekbar color="#4fc08d"
-          :max="currentFile ? Math.round(currentFile.duration) : 0"
-          :value="time"
-          @change="seekSong" />
-        <div id="current-time">{{ timeString }} / {{ durationString }}</div>
-        <div id="current-index">{{ files.length ? index+1 : 0 }} / {{ files.length }}</div>
-      </div>
+      <hr>
+
+      <p v-for="(data, i) in files" :key="data.path" class="listitem" @click="setCurrentIndex(i)">
+        <span v-if="i == currentIndex" class="item-index item-index-playing"><SvgIcon :icon="isPlaying ? 'play' : 'pause'"></SvgIcon></span>
+        <span v-else class="item-index">{{ data.track.no || i+1 }}</span>
+        <span class="item-name">{{ data.title || data.filename }}</span>
+      </p>
+    </div>
+
+    <div id="dock" class="clearfix">
+      <Seekbar color="#4fc08d"
+        :max="currentFile ? Math.round(currentFile.duration) : 0"
+        :value="time"
+        @change="seekSong" />
+      <div id="current-time">{{ timeString }} / {{ durationString }}</div>
+      <div id="current-index">{{ files.length ? index+1 : 0 }} / {{ files.length }}</div>
 
       <p id="controls">
+        <button id="repeat-button" @click="toggleRepeat" :class="{'off': !isRepeating}"><SvgIcon :icon="(isRepeating === 'one') ? 'repeat-one' : 'repeat'"></SvgIcon></button>
         <button id="prev-button" @click="prevSong"><SvgIcon icon="skip-backward"></SvgIcon></button>
         <button id="play-button" @click="togglePlay"><SvgIcon :icon="isPlaying ? 'pause' : 'play'"></SvgIcon></button>
         <button id="next-button" @click="nextSong"><SvgIcon icon="skip-forward"></SvgIcon></button>
-        <button id="repeat-button" @click="toggleRepeat" :class="{'off': !isRepeating}"><SvgIcon :icon="(isRepeating === 'one') ? 'repeat-one' : 'repeat'"></SvgIcon></button>
         <button id="shuffle-button" @click="toggleShuffle" :class="{'off': !isShuffling}"><SvgIcon icon="shuffle"></SvgIcon></button>
-
-        <button id="folder-button" @click="selectFolder">Open Folder</button>
       </p>
-
-      <hr>
-
-      <div>
-        <p v-for="(data, i) in files" :key="data.path" class="listitem" @click="setCurrentIndex(i)">
-          <span v-if="i == currentIndex" class="item-index item-index-playing"><SvgIcon :icon="isPlaying ? 'play' : 'pause'"></SvgIcon></span>
-          <span v-else class="item-index">{{ data.track.no || i+1 }}</span>
-          <span class="item-name">{{ data.title || data.filename }}</span>
-        </p>
-      </div>
-    </main>
+    </div>
   </div>
 </template>
 
@@ -77,7 +71,7 @@ export default {
       return this.isShuffling ? this.shuffleList[this.index] : this.index
     },
     currentFile () {
-      return this.files[this.currentIndex]
+      return this.files[this.currentIndex] || {}
     },
     timeString () {
       const min = Math.floor(this.time / 60)
@@ -249,118 +243,144 @@ export default {
 </script>
 
 <style lang="scss">
-#wrapper {
+button {
+  display: inline-block;
+  padding: 0.75em;
+  border: 1px solid #4fc08d;
+  border-radius: 2em;
+  outline: none;
+  color: #fff;
+  cursor: pointer;
+  background: none;
+  transition: background-color .2s ease;
+  &:hover {
+    background-color: rgba(79,192,141,.1);
+  }
+  &.off {
+    border-color: #ccc;
+    .icon {
+      fill: #ccc;
+    }
+  }
+
+  .icon {
+    width: 1.5em;
+    height: 1.5em;
+    fill: #4fc08d;
+  }
+}
+
+#main {
   background:
     radial-gradient(
       ellipse at top left,
       rgba(255, 255, 255, 1) 40%,
       rgba(229, 229, 229, .9) 100%
     );
-  height: 100vh;
-  padding: 40px 60px;
-  width: 100vw;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#library {
+  flex: 1;
+  width: 100%;
+  padding: 20px 40px;
+  overflow-x: hidden;
   overflow-y: scroll;
-}
 
-#title {
-  color: #2c3e50;
-  font-size: 2em;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-
-#artwork {
-  width: 100px;
-  height: 100px;
-  margin-right: 20px;
-  object-fit: contain;
-  float: left;
-}
-
-#song-title {
-  font-size: 1.2em;
-  font-weight: bold;
-}
-
-#current-time {
-  float: right;
-  font-size: .6em;
-  color: #777;
-}
-#current-index {
-  float: left;
-  font-size: .6em;
-  color: #777;
-}
-
-#controls {
-  button {
-    display: inline-block;
-    padding: 0.75em;
-    border: 1px solid #4fc08d;
-    border-radius: 2em;
-    outline: none;
-    color: #fff;
-    cursor: pointer;
-    background: none;
-    transition: background-color .2s ease;
-    &:hover {
-      background-color: rgba(79,192,141,.1);
-    }
-    &.off {
-      border-color: #ccc;
-      .icon {
-        fill: #ccc;
-      }
-    }
-  }
-  .icon {
-    width: 1.5em;
-    height: 1.5em;
-    fill: #4fc08d;
-  }
-
-  #play-button,
   #folder-button {
     background-color: #4fc08d;
+    float: right;
+    font-size: .8em;
     &:hover {
       background-color: rgba(79,192,141,.85);
     }
-
-    .icon {
-      fill: #fff;
-    }
   }
 
-  #folder-button {
-    float: right;
+  #artwork {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+    object-fit: contain;
+    float: left;
+  }
+  #song-title {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  .listitem {
+    margin: 0 -10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color .2s ease;
+    font-size: 16px;
+    line-height: 22px;
+    &:hover {
+      background-color: rgba(0, 0, 0, .03);
+    }
+
+    .item-index {
+      display: inline-block;
+      width: 2em;
+      padding-right: .5em;
+      text-align: right;
+      vertical-align: middle;
+
+      &-playing {
+        padding-right: .2em;
+      }
+    }
+    .item-name {
+      vertical-align: middle;
+    }
   }
 }
 
-.listitem {
-  margin: 0 -10px;
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color .2s ease;
-  font-size: 16px;
-  line-height: 22px;
-  &:hover {
-    background-color: rgba(0, 0, 0, .03);
+#dock {
+  width: 100%;
+  height: 90px;
+  background: #000;
+  text-align: center;
+  overflow: hidden;
+
+  #current-time,
+  #current-index {
+    font-size: .6em;
+    color: #777;
+    padding: 0 6px;
+  }
+  #current-time {
+    float: right;
+  }
+  #current-index {
+    float: left;
   }
 
-  .item-index {
-    display: inline-block;
-    width: 2em;
-    padding-right: .5em;
-    text-align: right;
-    vertical-align: middle;
+  #controls {
+    button {
+      padding: 0.5em;
+      border-radius: 2em;
 
-    &-playing {
-      padding-right: .2em;
+      .icon {
+        width: 1.5em;
+        height: 1.5em;
+      }
     }
-  }
-  .item-name {
-    vertical-align: middle;
+
+    #play-button {
+      background-color: #4fc08d;
+      &:hover {
+        background-color: rgba(79,192,141,.85);
+      }
+
+      .icon {
+        fill: #fff;
+      }
+    }
   }
 }
 </style>
