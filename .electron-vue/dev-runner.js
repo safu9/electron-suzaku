@@ -3,7 +3,6 @@
 const chalk = require('chalk')
 const electron = require('electron')
 const path = require('path')
-const { say } = require('cfonts')
 const { spawn } = require('child_process')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
@@ -20,7 +19,7 @@ function logStats (proc, data) {
   let log = ''
 
   log += chalk.yellow.bold(`┏ ${proc} Process ${new Array((19 - proc.length) + 1).join('-')}`)
-  log += '\n\n'
+  log += '\n'
 
   if (typeof data === 'object') {
     data.toString({
@@ -33,7 +32,7 @@ function logStats (proc, data) {
     log += `  ${data}\n`
   }
 
-  log += '\n' + chalk.yellow.bold(`┗ ${new Array(28 + 1).join('-')}`) + '\n'
+  log += chalk.yellow.bold(`┗ ${new Array(28 + 1).join('-')}`) + '\n'
 
   console.log(log)
 }
@@ -132,12 +131,12 @@ function electronLog (data, color) {
   let log = ''
   data = data.toString().split(/\r?\n/)
   data.forEach(line => {
-    log += `  ${line}\n`
+    if (line) log += `  ${line}\n`
   })
   if (/[0-9A-z]+/.test(log)) {
     console.log(
       chalk[color].bold('┏ Electron -------------------') +
-      '\n\n' +
+      '\n' +
       log +
       chalk[color].bold('┗ ----------------------------') +
       '\n'
@@ -146,20 +145,7 @@ function electronLog (data, color) {
 }
 
 function greeting () {
-  const cols = process.stdout.columns
-  let text = ''
-
-  if (cols > 104) text = 'electron-vue'
-  else if (cols > 76) text = 'electron-|vue'
-  else text = false
-
-  if (text) {
-    say(text, {
-      colors: ['yellow'],
-      font: 'simple3d',
-      space: false
-    })
-  } else console.log(chalk.yellow.bold('\n  electron-vue'))
+  console.log(chalk.yellow.bold('  electron-vue'))
   console.log(chalk.blue('  getting ready...') + '\n')
 }
 
