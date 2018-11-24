@@ -1,9 +1,11 @@
 'use strict'
 
 import { app, dialog, ipcMain, BrowserWindow, Menu } from 'electron'
+import DB from './db'
 
 const fs = require('fs')
 const path = require('path')
+const crypto = require('crypto')
 const mm = require('music-metadata')
 
 const isDevelopment = (process.env.NODE_ENV === 'development')
@@ -110,10 +112,13 @@ ipcMain.on('select_folder', openFolder)
 function openFolder () {
   dialog.showOpenDialog({ properties: ['openDirectory'] }, dirs => {
     if (dirs) {
+      const db = new DB(app.getPath('userData'))
+
       fs.readdir(dirs[0], async (_err, files) => {
         const supportedExt = ['.mp3', '.aac', '.m4a', '.3gp', '.ogg', '.opus', '.flac', '.wav']
+        let newData = []
 
-        const arg = await Promise.all(
+        const data = await Promise.all(
           files
             .filter(file => {
               const ext = path.extname(file).toLowerCase()
@@ -121,14 +126,33 @@ function openFolder () {
             })
             .map(async (filename) => {
               const filePath = path.join(dirs[0], filename)
-              let data = {}
+              const timestamp = fs.statSync(filePath).mtimeMs
 
+              const doc = await db.find({path: filePath})
+              if (doc && doc.length) {
+                if (doc[0].timestamp === timestamp) {
+                  return doc[0]
+                } else {
+                  await db.remove({ path: filePath })
+                }
+              }
+
+              let data = {}
               try {
                 const metadata = await mm.parseFile(filePath, {native: true})
 
                 if (metadata.common.picture) {
-                  let pic = metadata.common.picture[0]
-                  metadata.common.picture = 'data:' + pic.format + ';base64,' + pic.data.toString('base64')
+                  const pic = metadata.common.picture[0]
+
+                  const md5 = crypto.createHash('md5')
+                  md5.update(pic.data, 'binary')
+                  const hash = md5.digest('hex')
+                  const imgpath = path.join(app.getPath('userData'), 'data', hash)
+                  if (!fs.existsSync(imgpath)) {
+                    fs.writeFile(imgpath, pic.data, (_err) => {})
+                  }
+
+                  metadata.common.picture = imgpath
                 }
 
                 data = Object.assign(metadata.common, metadata.format)
@@ -138,11 +162,17 @@ function openFolder () {
 
               data.path = filePath
               data.filename = filename
+              data.timestamp = timestamp
+
+              newData.push(data)
               return data
             })
         )
 
-        mainWindow.webContents.send('selected_folder', arg)
+        db.insert(newData)
+        db.clean()
+
+        mainWindow.webContents.send('selected_folder', data)
       })
     }
   })

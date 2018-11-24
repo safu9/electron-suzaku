@@ -4,7 +4,7 @@
       <div class="clearfix">
         <button id="folder-button" @click="selectFolder">Open Folder</button>
 
-        <img id="artwork" :src="currentFile.picture || 'static/blank.png'" />
+        <img id="artwork" :src="currentFile.picture ? ('file://' + currentFile.picture) : 'static/blank.png'" />
         <p id="song-title">{{ currentFile.title || currentFile.filename || 'Suzaku' }}</p>
         <p>
           <span v-show="currentFile.album">{{ currentFile.album }}</span>
