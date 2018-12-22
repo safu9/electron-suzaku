@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters, mapMutations } from 'vuex'
 import Seekbar from '@/components/Seekbar'
 import SvgIcon from '@/components/SvgIcon'
 
@@ -53,39 +54,27 @@ export default {
   },
   data () {
     return {
-      files: [],
-      index: 0,
       audio: null,
-      time: 0,
       timeIntervalID: null,
-      isPlaying: false,
-      isRepeating: false,
-      isShuffling: false,
-      shuffleList: [],
       audioContext: null
     }
   },
   computed: {
-    // Shuffled index and file
-    currentIndex () {
-      return this.isShuffling ? this.shuffleList[this.index] : this.index
-    },
-    currentFile () {
-      return this.files[this.currentIndex] || {}
-    },
-    timeString () {
-      const min = Math.floor(this.time / 60)
-      const sec = this.time % 60
-      return min + ':' + (sec < 10 ? '0' : '') + sec
-    },
-    durationString () {
-      if (!this.currentFile) {
-        return '0:00'
-      }
-      const min = Math.floor(this.currentFile.duration / 60)
-      const sec = Math.round(this.currentFile.duration) % 60
-      return min + ':' + (sec < 10 ? '0' : '') + sec
-    }
+    ...mapState('playlist', [
+      'files',
+      'index',
+      'time',
+      'isPlaying',
+      'isRepeating',
+      'isShuffling',
+      'shuffleList'
+    ]),
+    ...mapGetters('playlist', [
+      'currentIndex',
+      'currentFile',
+      'timeString',
+      'durationString'
+    ])
   },
   mounted () {
     this.audioContext = new AudioContext()
@@ -95,6 +84,17 @@ export default {
     })
   },
   methods: {
+    ...mapMutations('playlist', [
+      'setFiles',
+      'setIndex',
+      'setTime',
+      'setIsPlaying',
+      'setIsRepeating',
+      'setIsShuffling',
+      'clearShuffleList',
+      'updateShuffleList'
+    ]),
+
     selectFolder () {
       this.$electron.ipcRenderer.send('select_folder')
     },
@@ -103,8 +103,8 @@ export default {
         return
       }
 
-      this.files = files
-      this.index = 0
+      this.setFiles(files)
+      this.updateIndex(0)
 
       this.initPlayer()
       this.togglePlay()
@@ -124,7 +124,7 @@ export default {
       this.audio.src = path
       this.audio.onended = this.onSongEnded
 
-      this.isPlaying = false
+      this.setIsPlaying(false)
 
       let source = this.audioContext.createMediaElementSource(this.audio)
       source.connect(this.audioContext.destination)
@@ -150,15 +150,15 @@ export default {
           .catch(err => {
             console.log(err)
             this.audio = null
-            this.isPlaying = false
+            this.setIsPlaying(false)
           })
 
         this.timeIntervalID = window.setInterval(this.updateSeekbar, 200)
       }
 
-      this.isPlaying = !this.audio.paused
+      this.setIsPlaying(!this.audio.paused)
     },
-    setIndex (index) {
+    updateIndex (index) {
       if (index < 0 || this.files.length <= index) {
         if (this.isRepeating === true) {
           index = (index + this.files.length) % this.files.length
@@ -168,12 +168,12 @@ export default {
         } else {
           if (this.audio && this.isPlaying) {
             this.audio.pause()
-            this.isPlaying = false
+            this.setIsPlaying(false)
           }
           return
         }
       }
-      this.index = index
+      this.setIndex(index)
 
       const wasPlaying = this.isPlaying
       this.initPlayer()
@@ -183,54 +183,38 @@ export default {
     },
     setCurrentIndex (index) {
       index = this.isShuffling ? this.shuffleList.indexOf(index) : index
-      this.setIndex(index)
+      this.updateIndex(index)
     },
     nextSong () {
-      this.setIndex(this.index + 1)
+      this.updateIndex(this.index + 1)
     },
     prevSong () {
-      this.setIndex(this.index - 1)
+      this.updateIndex(this.index - 1)
     },
     toggleRepeat () {
       if (this.isRepeating === true) {
-        this.isRepeating = 'one'
+        this.setIsRepeating('one')
       } else if (this.isRepeating === 'one') {
-        this.isRepeating = false
+        this.setIsRepeating(false)
       } else {
-        this.isRepeating = true
+        this.setIsRepeating(true)
       }
     },
     toggleShuffle () {
-      this.isShuffling = !this.isShuffling
+      this.setIsShuffling(!this.isShuffling)
 
       if (this.isShuffling) {
         this.updateShuffleList()
       } else {
-        this.index = this.shuffleList[this.index]
-        this.shuffleList = []
+        this.setIndex(this.shuffleList[this.index])
+        this.clearShuffleList()
       }
-    },
-    updateShuffleList () {
-      this.shuffleList = [...Array(this.files.length).keys()]
-
-      for (var i = this.shuffleList.length - 1; i > 0; i--) {
-        const r = Math.floor(Math.random() * (i + 1))
-        const tmp = this.shuffleList[i]
-        this.shuffleList[i] = this.shuffleList[r]
-        this.shuffleList[r] = tmp
-      }
-
-      // Set new index
-      this.shuffleList[this.shuffleList.indexOf(this.index)] = this.shuffleList[0]
-      this.shuffleList[0] = this.index
-
-      this.index = 0
     },
     updateSeekbar () {
       if (this.audio) {
-        this.time = Math.round(this.audio.currentTime)
+        this.setTime(Math.round(this.audio.currentTime))
       } else {
-        this.time = 0
+        this.setTime(0)
       }
     },
     seekSong (val) {
