@@ -1,71 +1,31 @@
 const path = require('path')
-const Datastore = require('nedb')
+const Datastore = require('nedb-promise')
 
 export default class {
   constructor (basepath) {
     const filepath = path.join(basepath, 'data', 'data.db')
-    this.db = new Datastore({ filename: filepath, autoload: true })
-    this.db.ensureIndex({ fieldName: 'path', unique: true, sparse: true }, (_err) => {})
+    this.db = Datastore({ filename: filepath, autoload: true })
+    this.db.ensureIndex({ fieldName: 'path', unique: true, sparse: true })
   }
 
   insert (data) {
-    return new Promise((resolve, reject) => {
-      this.db.insert(data, (err, docs) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(docs)
-        }
-      })
-    })
+    return this.db.insert(data)
   }
 
   find (query) {
-    return new Promise((resolve, reject) => {
-      this.db.find(query, (err, docs) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(docs)
-        }
-      })
-    })
+    return this.db.find(query)
   }
 
   findWithSort (query, sort) {
-    return new Promise((resolve, reject) => {
-      this.db.find(query).sort(sort).exec((err, docs) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(docs)
-        }
-      })
-    })
+    return this.db.cfind(query).sort(sort).exec()
   }
 
   findOne (query) {
-    return new Promise((resolve, reject) => {
-      this.db.findOne(query, (err, doc) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(doc)
-        }
-      })
-    })
+    return this.db.findOne(query)
   }
 
   remove (query) {
-    return new Promise((resolve, reject) => {
-      this.db.remove(query, {}, (err, numRemoved) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(numRemoved)
-        }
-      })
-    })
+    return this.db.remove(query, {})
   }
 
   clean () {
