@@ -1,5 +1,5 @@
 const state = {
-  files: [],
+  tracks: [],
   index: 0,
   time: 0,
   isPlaying: false,
@@ -9,8 +9,8 @@ const state = {
 }
 
 const mutations = {
-  setFiles (state, files) {
-    state.files = files
+  setTracks (state, tracks) {
+    state.tracks = tracks
   },
   setIndex (state, index) {
     state.index = index
@@ -32,7 +32,7 @@ const mutations = {
     state.shuffleList = []
   },
   updateShuffleList (state) {
-    state.shuffleList = [...Array(state.files.length).keys()]
+    state.shuffleList = [...Array(state.tracks.length).keys()]
 
     for (var i = state.shuffleList.length - 1; i > 0; i--) {
       const r = Math.floor(Math.random() * (i + 1))
@@ -57,8 +57,8 @@ const getters = {
   currentIndex: (state) => {
     return state.isShuffling ? state.shuffleList[state.index] : state.index
   },
-  currentFile: (state, getters) => {
-    return state.files[getters.currentIndex] || {}
+  currentTrack: (state, getters) => {
+    return state.tracks[getters.currentIndex] || {}
   },
   timeString: (state) => {
     const min = Math.floor(state.time / 60)
@@ -66,11 +66,11 @@ const getters = {
     return min + ':' + (sec < 10 ? '0' : '') + sec
   },
   durationString: (state, getters) => {
-    if (!getters.currentFile) {
+    if (!getters.currentTrack) {
       return '0:00'
     }
-    const min = Math.floor(getters.currentFile.duration / 60)
-    const sec = Math.round(getters.currentFile.duration) % 60
+    const min = Math.floor(getters.currentTrack.duration / 60)
+    const sec = Math.round(getters.currentTrack.duration) % 60
     return min + ':' + (sec < 10 ? '0' : '') + sec
   }
 }

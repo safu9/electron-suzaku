@@ -4,31 +4,31 @@
       <div class="clearfix">
         <button id="folder-button" @click="selectFolder">Open Folder</button>
 
-        <img id="artwork" :src="currentFile.picture ? ('file://' + currentFile.picture) : 'static/blank.png'" />
-        <p id="song-title">{{ currentFile.title || currentFile.filename || 'Suzaku' }}</p>
+        <img id="artwork" :src="currentTrack.picture ? ('file://' + currentTrack.picture) : 'static/blank.png'" />
+        <p id="song-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</p>
         <p>
-          <span v-show="currentFile.album">{{ currentFile.album }}</span>
-          <span v-show="currentFile.album && currentFile.artist">/</span>
-          <span v-show="currentFile.artist">{{ currentFile.artist }}</span>
+          <span v-show="currentTrack.album">{{ currentTrack.album }}</span>
+          <span v-show="currentTrack.album && currentTrack.artist">/</span>
+          <span v-show="currentTrack.artist">{{ currentTrack.artist }}</span>
         </p>
       </div>
 
       <hr>
 
-      <p v-for="(data, i) in files" :key="data.path" class="listitem" @click="setCurrentIndex(i)">
+      <p v-for="(track, i) in tracks" :key="track.path" class="listitem" @click="setCurrentIndex(i)">
         <span v-if="i == currentIndex" class="item-index item-index-playing"><SvgIcon :icon="isPlaying ? 'play' : 'pause'"></SvgIcon></span>
-        <span v-else class="item-index">{{ data.track.no || i+1 }}</span>
-        <span class="item-name">{{ data.title || data.filename }}</span>
+        <span v-else class="item-index">{{ track.track.no || i+1 }}</span>
+        <span class="item-name">{{ track.title || track.filename }}</span>
       </p>
     </div>
 
     <div id="dock" class="clearfix">
       <Seekbar color="#4fc08d"
-        :max="currentFile ? Math.round(currentFile.duration) : 0"
+        :max="currentTrack ? Math.round(currentTrack.duration) : 0"
         :value="time"
         @change="seekSong" />
       <div id="current-time">{{ timeString }} / {{ durationString }}</div>
-      <div id="current-index">{{ files.length ? index+1 : 0 }} / {{ files.length }}</div>
+      <div id="current-index">{{ tracks.length ? index+1 : 0 }} / {{ tracks.length }}</div>
 
       <p id="controls">
         <button id="repeat-button" @click="toggleRepeat" :class="{'off': !isRepeating}"><SvgIcon :icon="(isRepeating === 'one') ? 'repeat-one' : 'repeat'"></SvgIcon></button>
@@ -61,7 +61,7 @@ export default {
   },
   computed: {
     ...mapState('playlist', [
-      'files',
+      'tracks',
       'index',
       'time',
       'isPlaying',
@@ -71,7 +71,7 @@ export default {
     ]),
     ...mapGetters('playlist', [
       'currentIndex',
-      'currentFile',
+      'currentTrack',
       'timeString',
       'durationString'
     ])
@@ -85,7 +85,7 @@ export default {
   },
   methods: {
     ...mapMutations('playlist', [
-      'setFiles',
+      'setTracks',
       'setIndex',
       'setTime',
       'setIsPlaying',
@@ -98,22 +98,22 @@ export default {
     selectFolder () {
       this.$electron.ipcRenderer.send('select_folder')
     },
-    onFolderSelected (files) {
-      if (!files) {
+    onFolderSelected (tracks) {
+      if (!tracks) {
         return
       }
 
-      this.setFiles(files)
+      this.setTracks(tracks)
       this.updateIndex(0)
 
       this.initPlayer()
       this.togglePlay()
     },
     initPlayer () {
-      if (!this.currentFile) {
+      if (!this.currentTrack) {
         return
       }
-      const path = this.currentFile.path
+      const path = this.currentTrack.path
 
       if (this.audio) {
         this.audio.pause()
@@ -159,9 +159,9 @@ export default {
       this.setIsPlaying(!this.audio.paused)
     },
     updateIndex (index) {
-      if (index < 0 || this.files.length <= index) {
+      if (index < 0 || this.tracks.length <= index) {
         if (this.isRepeating === true) {
-          index = (index + this.files.length) % this.files.length
+          index = (index + this.tracks.length) % this.tracks.length
           if (this.isShuffling) {
             this.updateShuffleList()
           }

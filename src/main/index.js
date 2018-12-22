@@ -132,9 +132,9 @@ function openFolder () {
 
       fs.readdir(dirs[0], async (_err, files) => {
         const supportedExt = ['.mp3', '.aac', '.m4a', '.3gp', '.ogg', '.opus', '.flac', '.wav']
-        let newData = []
+        let newTracks = []
 
-        const data = await Promise.all(
+        const tracks = await Promise.all(
           files
             .filter(file => {
               const ext = path.extname(file).toLowerCase()
@@ -153,7 +153,7 @@ function openFolder () {
                 }
               }
 
-              let data = {}
+              let track = {}
               try {
                 const metadata = await mm.parseFile(filePath, {native: true})
 
@@ -171,26 +171,26 @@ function openFolder () {
                   metadata.common.picture = imgpath
                 }
 
-                data = Object.assign(metadata.common, metadata.format)
+                track = Object.assign(metadata.common, metadata.format)
 
-                data.type = 'track'
-                data.path = filePath
-                data.filename = filename
-                data.timestamp = timestamp
+                track.type = 'track'
+                track.path = filePath
+                track.filename = filename
+                track.timestamp = timestamp
 
-                newData.push(data)
+                newTracks.push(track)
               } catch (err) {
                 console.log(err.message)
               }
 
-              return data
+              return track
             })
         )
 
         const newAlbums = []
         const newArtists = []
 
-        for (const track of newData) {
+        for (const track of newTracks) {
           if (track.album) {
             let album = newAlbums.find(i => (i.type === 'album' && i.album === track.album))
             if (!album) {
@@ -229,10 +229,10 @@ function openFolder () {
           }
         }
 
-        newData = newData.concat(newAlbums, newArtists)
+        const newData = newTracks.concat(newAlbums, newArtists)
         await db.insert(newData)
 
-        mainWindow.webContents.send('selected_folder', data)
+        mainWindow.webContents.send('selected_folder', tracks)
         loadData()
       })
     }
