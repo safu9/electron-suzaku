@@ -5,12 +5,12 @@ export default class {
   constructor (basepath) {
     const filepath = path.join(basepath, 'data', 'data.db')
     this.db = new Datastore({ filename: filepath, autoload: true })
-    this.db.ensureIndex({ fieldName: 'path', unique: true }, (_err) => {})
+    this.db.ensureIndex({ fieldName: 'path', unique: true, sparse: true }, (_err) => {})
   }
 
-  insert (tracks) {
+  insert (data) {
     return new Promise((resolve, reject) => {
-      this.db.insert(tracks, (err, docs) => {
+      this.db.insert(data, (err, docs) => {
         if (err) {
           reject(err)
         } else {
@@ -27,6 +27,30 @@ export default class {
           reject(err)
         } else {
           resolve(docs)
+        }
+      })
+    })
+  }
+
+  findWithSort (query, sort) {
+    return new Promise((resolve, reject) => {
+      this.db.find(query).sort(sort).exec((err, docs) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(docs)
+        }
+      })
+    })
+  }
+
+  findOne (query) {
+    return new Promise((resolve, reject) => {
+      this.db.findOne(query, (err, doc) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(doc)
         }
       })
     })

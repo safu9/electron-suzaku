@@ -7,6 +7,11 @@ export default new Router({
   routes: [
     {
       path: '/',
+      name: 'top-page',
+      component: require('@/views/TopPage').default
+    },
+    {
+      path: '/player',
       name: 'player-page',
       component: require('@/views/PlayerPage').default
     },

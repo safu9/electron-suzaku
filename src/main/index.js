@@ -108,8 +108,23 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('select_folder', openFolder)
+ipcMain.on('load_data', loadData)
+async function loadData () {
+  const db = new DB(app.getPath('userData'))
 
+  try {
+    const data = {
+      artists: await db.findWithSort({type: 'artist'}, { artistsort: 1 }),
+      albums: await db.findWithSort({type: 'album'}, { albumsort: 1 })
+    }
+
+    mainWindow.webContents.send('data_loaded', data)
+  } catch (err) {
+    console.log(err.message)
+  }
+}
+
+ipcMain.on('select_folder', openFolder)
 function openFolder () {
   dialog.showOpenDialog({ properties: ['openDirectory'] }, dirs => {
     if (dirs) {
@@ -129,12 +144,12 @@ function openFolder () {
               const filePath = path.join(dirs[0], filename)
               const timestamp = fs.statSync(filePath).mtimeMs
 
-              const doc = await db.find({path: filePath})
-              if (doc && doc.length) {
-                if (doc[0].timestamp === timestamp) {
-                  return doc[0]
+              const doc = await db.findOne({path: filePath})
+              if (doc) {
+                if (doc.timestamp === timestamp) {
+                  return doc
                 } else {
-                  await db.remove({ path: filePath })
+                  await db.remove({path: filePath})
                 }
               }
 
@@ -157,23 +172,68 @@ function openFolder () {
                 }
 
                 data = Object.assign(metadata.common, metadata.format)
+
+                data.type = 'track'
+                data.path = filePath
+                data.filename = filename
+                data.timestamp = timestamp
+
+                newData.push(data)
               } catch (err) {
                 console.log(err.message)
               }
 
-              data.path = filePath
-              data.filename = filename
-              data.timestamp = timestamp
-
-              newData.push(data)
               return data
             })
         )
 
-        db.insert(newData)
-        db.clean()
+        const newAlbums = []
+        const newArtists = []
+
+        for (const track of newData) {
+          if (track.album) {
+            let album = newAlbums.find(i => (i.type === 'album' && i.album === track.album))
+            if (!album) {
+              album = await db.findOne({type: 'album', album: track.album})
+            }
+
+            if (!album) {
+              album = {
+                type: 'album',
+                album: track.album
+              }
+              album.albumsort = (track.albumsort || album.album || '').toLowerCase()
+              album.artist = track.albumartist || track.artist
+              album.artistsort = (track.albumartistsort || track.artistsort || album.artist || '').toLowerCase()
+              album.picture = track.picture
+
+              newAlbums.push(album)
+            }
+          }
+
+          if (track.artist) {
+            let artist = newArtists.find(i => (i.type === 'artist' && i.artist === track.artist))
+            if (!artist) {
+              artist = await db.findOne({type: 'artist', artist: track.artist})
+            }
+
+            if (!artist) {
+              artist = {
+                type: 'artist',
+                artist: track.artist
+              }
+              artist.artistsort = (track.artistsort || artist.artist || '').toLowerCase()
+
+              newArtists.push(artist)
+            }
+          }
+        }
+
+        newData = newData.concat(newAlbums, newArtists)
+        await db.insert(newData)
 
         mainWindow.webContents.send('selected_folder', data)
+        loadData()
       })
     }
   })
