@@ -104,12 +104,10 @@ export default {
       }
 
       this.setTracks(tracks)
-      this.updateIndex(0)
-
-      this.initPlayer()
-      this.togglePlay()
+      this.setIndex(0)
+      this.initPlayer(true)
     },
-    initPlayer () {
+    initPlayer (startPlay) {
       if (!this.currentTrack) {
         return
       }
@@ -124,10 +122,14 @@ export default {
       this.audio.src = path
       this.audio.onended = this.onSongEnded
 
-      this.setIsPlaying(false)
-
       let source = this.audioContext.createMediaElementSource(this.audio)
       source.connect(this.audioContext.destination)
+
+      if (startPlay) {
+        this.togglePlay()
+      } else {
+        this.setIsPlaying(false)
+      }
     },
     onSongEnded () {
       if (this.isRepeating === 'one') {
@@ -174,12 +176,7 @@ export default {
         }
       }
       this.setIndex(index)
-
-      const wasPlaying = this.isPlaying
-      this.initPlayer()
-      if (wasPlaying) {
-        this.togglePlay()
-      }
+      this.initPlayer(this.isPlaying)
     },
     setCurrentIndex (index) {
       index = this.isShuffling ? this.shuffleList.indexOf(index) : index
