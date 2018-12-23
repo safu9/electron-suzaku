@@ -5,7 +5,11 @@ const state = {
   isPlaying: false,
   isRepeating: false,
   isShuffling: false,
-  shuffleList: []
+  shuffleList: [],
+
+  audio: null,
+  audioContext: new AudioContext(),
+  timeIntervalID: null
 }
 
 const mutations = {
@@ -46,10 +50,128 @@ const mutations = {
     state.shuffleList[0] = state.index
 
     state.index = 0
+  },
+
+  setAudio (state, audio) {
+    state.audio = audio
+  },
+  setTimeIntervalID (state, id) {
+    state.timeIntervalID = id
   }
 }
 
 const actions = {
+  initPlayer ({ commit, dispatch, state, getters }, startPlay) {
+    if (!getters.currentTrack) {
+      return
+    }
+    const path = getters.currentTrack.path
+
+    if (state.audio) {
+      state.audio.pause()
+    }
+
+    commit('setAudio', new Audio())
+    state.audio.src = path
+    state.audio.onended = () => {
+      dispatch('onSongEnded')
+    }
+
+    let source = state.audioContext.createMediaElementSource(state.audio)
+    source.connect(state.audioContext.destination)
+
+    if (startPlay) {
+      dispatch('togglePlay')
+    } else {
+      commit('setIsPlaying', false)
+    }
+  },
+  onSongEnded ({ dispatch, state }) {
+    if (state.isRepeating === 'one') {
+      state.audio.play()
+    } else {
+      dispatch('nextSong')
+    }
+  },
+  togglePlay ({ dispatch, commit, state }) {
+    if (!state.audio) {
+      return
+    }
+
+    if (!state.audio.paused) {
+      state.audio.pause()
+
+      window.clearInterval(state.timeIntervalID)
+    } else {
+      state.audio.play()
+        .catch(err => {
+          console.log(err)
+          commit('setAudio', null)
+          commit('setIsPlaying', false)
+        })
+
+      const id = window.setInterval(() => {
+        dispatch('updateTime')
+      }, 200)
+      commit('setTimeIntervalID', id)
+    }
+
+    commit('setIsPlaying', !state.audio.paused)
+  },
+  updateIndex ({ dispatch, commit, state }, index) {
+    if (index < 0 || state.tracks.length <= index) {
+      if (state.isRepeating === true) {
+        index = (index + state.tracks.length) % state.tracks.length
+        if (state.isShuffling) {
+          commit('updateShuffleList')
+        }
+      } else {
+        if (state.audio && state.isPlaying) {
+          state.audio.pause()
+          commit('setIsPlaying', false)
+        }
+        return
+      }
+    }
+    commit('setIndex', index)
+    dispatch('initPlayer', state.isPlaying)
+  },
+  setCurrentIndex ({ dispatch, state }, index) {
+    index = state.isShuffling ? state.shuffleList.indexOf(index) : index
+    dispatch('updateIndex', index)
+  },
+  nextSong ({ dispatch, state }) {
+    dispatch('updateIndex', state.index + 1)
+  },
+  prevSong ({ dispatch, state }) {
+    dispatch('updateIndex', state.index - 1)
+  },
+  toggleRepeat ({ commit, state }) {
+    if (state.isRepeating === true) {
+      commit('setIsRepeating', 'one')
+    } else if (state.isRepeating === 'one') {
+      commit('setIsRepeating', false)
+    } else {
+      commit('setIsRepeating', true)
+    }
+  },
+  toggleShuffle ({ commit, state }) {
+    commit('setIsShuffling', !state.isShuffling)
+
+    if (state.isShuffling) {
+      commit('updateShuffleList')
+    } else {
+      commit('setIndex', state.shuffleList[state.index])
+      commit('clearShuffleList')
+    }
+  },
+  updateTime ({ commit, state }) {
+    if (state.audio) {
+      commit('setTime', Math.round(state.audio.currentTime))
+    } else {
+      commit('setTime', 0)
+    }
+  }
 }
 
 const getters = {

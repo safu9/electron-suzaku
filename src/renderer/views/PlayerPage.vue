@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations } from 'vuex'
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 import Seekbar from '@/components/Seekbar'
 import SvgIcon from '@/components/SvgIcon'
 
@@ -54,9 +54,6 @@ export default {
   },
   data () {
     return {
-      audio: null,
-      timeIntervalID: null,
-      audioContext: null
     }
   },
   computed: {
@@ -67,7 +64,7 @@ export default {
       'isPlaying',
       'isRepeating',
       'isShuffling',
-      'shuffleList'
+      'audio'
     ]),
     ...mapGetters('playlist', [
       'currentIndex',
@@ -77,8 +74,6 @@ export default {
     ])
   },
   mounted () {
-    this.audioContext = new AudioContext()
-
     this.$electron.ipcRenderer.on('selected_folder', (_event, arg) => {
       this.onFolderSelected(arg)
     })
@@ -86,13 +81,16 @@ export default {
   methods: {
     ...mapMutations('playlist', [
       'setTracks',
-      'setIndex',
-      'setTime',
-      'setIsPlaying',
-      'setIsRepeating',
-      'setIsShuffling',
-      'clearShuffleList',
-      'updateShuffleList'
+      'setIndex'
+    ]),
+    ...mapActions('playlist', [
+      'initPlayer',
+      'setCurrentIndex',
+      'togglePlay',
+      'toggleRepeat',
+      'toggleShuffle',
+      'nextSong',
+      'prevSong'
     ]),
 
     selectFolder () {
@@ -107,113 +105,7 @@ export default {
       this.setIndex(0)
       this.initPlayer(true)
     },
-    initPlayer (startPlay) {
-      if (!this.currentTrack) {
-        return
-      }
-      const path = this.currentTrack.path
 
-      if (this.audio) {
-        this.audio.pause()
-        this.audio = null
-      }
-
-      this.audio = new Audio()
-      this.audio.src = path
-      this.audio.onended = this.onSongEnded
-
-      let source = this.audioContext.createMediaElementSource(this.audio)
-      source.connect(this.audioContext.destination)
-
-      if (startPlay) {
-        this.togglePlay()
-      } else {
-        this.setIsPlaying(false)
-      }
-    },
-    onSongEnded () {
-      if (this.isRepeating === 'one') {
-        this.audio.play()
-      } else {
-        this.nextSong()
-      }
-    },
-    togglePlay () {
-      if (!this.audio) {
-        return
-      }
-
-      if (!this.audio.paused) {
-        this.audio.pause()
-
-        window.clearInterval(this.timeIntervalID)
-      } else {
-        this.audio.play()
-          .catch(err => {
-            console.log(err)
-            this.audio = null
-            this.setIsPlaying(false)
-          })
-
-        this.timeIntervalID = window.setInterval(this.updateSeekbar, 200)
-      }
-
-      this.setIsPlaying(!this.audio.paused)
-    },
-    updateIndex (index) {
-      if (index < 0 || this.tracks.length <= index) {
-        if (this.isRepeating === true) {
-          index = (index + this.tracks.length) % this.tracks.length
-          if (this.isShuffling) {
-            this.updateShuffleList()
-          }
-        } else {
-          if (this.audio && this.isPlaying) {
-            this.audio.pause()
-            this.setIsPlaying(false)
-          }
-          return
-        }
-      }
-      this.setIndex(index)
-      this.initPlayer(this.isPlaying)
-    },
-    setCurrentIndex (index) {
-      index = this.isShuffling ? this.shuffleList.indexOf(index) : index
-      this.updateIndex(index)
-    },
-    nextSong () {
-      this.updateIndex(this.index + 1)
-    },
-    prevSong () {
-      this.updateIndex(this.index - 1)
-    },
-    toggleRepeat () {
-      if (this.isRepeating === true) {
-        this.setIsRepeating('one')
-      } else if (this.isRepeating === 'one') {
-        this.setIsRepeating(false)
-      } else {
-        this.setIsRepeating(true)
-      }
-    },
-    toggleShuffle () {
-      this.setIsShuffling(!this.isShuffling)
-
-      if (this.isShuffling) {
-        this.updateShuffleList()
-      } else {
-        this.setIndex(this.shuffleList[this.index])
-        this.clearShuffleList()
-      }
-    },
-    updateSeekbar () {
-      if (this.audio) {
-        this.setTime(Math.round(this.audio.currentTime))
-      } else {
-        this.setTime(0)
-      }
-    },
     seekSong (val) {
       if (this.audio) {
         this.audio.currentTime = val
