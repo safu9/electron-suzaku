@@ -3,42 +3,38 @@
     <div id="library">
       <router-link :to="{ name: 'top' }">top</router-link>
 
-      <div class="clearfix">
-        <img id="artwork" :src="album.picture ? ('file://' + album.picture) : 'static/blank.png'" />
-        <p id="song-title">{{ album.album }}</p>
-        <p>
-          <span v-show="album.artist">{{ album.albumartist || album.artist }}</span>
-        </p>
+      <div>
+        <p id="song-title">{{ artist.artist }}</p>
       </div>
 
       <hr>
 
-      <p v-for="(track, i) in tracks" :key="track._id" class="listitem">
-        <span class="item-index">{{ track.track.no || i+1 }}</span>
-        <span class="item-name">{{ track.title || track.filename }}</span>
-      </p>
+      <router-link v-for="(album, i) in albums" :key="album._id"
+         :to="{ name: 'album', params: { id: album._id }}" class="listitem">
+        <span class="item-name">{{ album.album }}</span>
+      </router-link>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'album-page',
+  name: 'artist-page',
   components: {
   },
   data () {
     return {
-      album: {},
-      tracks: []
+      artist: {},
+      albums: []
     }
   },
   computed: {
   },
   mounted () {
-    this.$electron.ipcRenderer.on('album_loaded', (_event, arg) => {
+    this.$electron.ipcRenderer.on('artist_loaded', (_event, arg) => {
       this.onDataLoaded(arg)
     })
-    this.$electron.ipcRenderer.send('load_album', this.$route.params.id)
+    this.$electron.ipcRenderer.send('load_artist', this.$route.params.id)
   },
   methods: {
     onDataLoaded (data) {
@@ -46,8 +42,8 @@ export default {
         return
       }
 
-      this.album = data.album
-      this.tracks = data.tracks
+      this.artist = data.artist
+      this.albums = data.albums
     }
   }
 }
@@ -75,19 +71,16 @@ export default {
   overflow-x: hidden;
   overflow-y: scroll;
 
-  #artwork {
-    width: 100px;
-    height: 100px;
-    margin-right: 20px;
-    object-fit: contain;
-    float: left;
-  }
   #song-title {
     font-size: 1.2em;
     font-weight: bold;
   }
 
   .listitem {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+
     margin: 0 -10px;
     padding: 10px;
     cursor: pointer;

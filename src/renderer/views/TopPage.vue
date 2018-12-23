@@ -7,9 +7,10 @@
 
       <hr>
 
-      <p v-for="(artist, i) in artists" :key="artist._id" class="listitem">
+      <router-link v-for="(artist, i) in artists" :key="artist._id"
+         :to="{ name: 'artist', params: { id: artist._id }}" class="listitem">
         <span class="item-name">{{ artist.artist }}</span>
-      </p>
+      </router-link>
 
       <hr>
 

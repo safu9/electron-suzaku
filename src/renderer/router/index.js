@@ -16,6 +16,11 @@ export default new Router({
       component: require('@/views/AlbumPage').default
     },
     {
+      path: '/artist/:id',
+      name: 'artist',
+      component: require('@/views/ArtistPage').default
+    },
+    {
       path: '/player',
       name: 'player',
       component: require('@/views/PlayerPage').default

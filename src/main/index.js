@@ -140,6 +140,27 @@ async function loadAlbum (_event, arg) {
   }
 }
 
+ipcMain.on('load_artist', loadArtist)
+async function loadArtist (_event, arg) {
+  const db = new DB(app.getPath('userData'))
+
+  try {
+    const artists = await db.getArtists({_id: arg}).exec()
+    if (!artists || artists.length === 0) {
+      return
+    }
+
+    const data = {
+      artist: artists[0],
+      albums: await db.getAlbums({artist: artists[0].artist}).sort({album: 1}).exec()
+    }
+
+    mainWindow.webContents.send('artist_loaded', data)
+  } catch (err) {
+    console.log(err.message)
+  }
+}
+
 ipcMain.on('select_folder', openFolder)
 function openFolder () {
   dialog.showOpenDialog({ properties: ['openDirectory'] }, async (dirs) => {
