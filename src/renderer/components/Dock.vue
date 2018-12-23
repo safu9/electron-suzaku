@@ -64,33 +64,6 @@ export default {
 </script>
 
 <style lang="scss">
-button {
-  display: inline-block;
-  padding: 0.75em;
-  border: 1px solid #4fc08d;
-  border-radius: 2em;
-  outline: none;
-  color: #fff;
-  cursor: pointer;
-  background: none;
-  transition: background-color .2s ease;
-  &:hover {
-    background-color: rgba(79,192,141,.1);
-  }
-  &.off {
-    border-color: #ccc;
-    .icon {
-      fill: #ccc;
-    }
-  }
-
-  .icon {
-    width: 1.5em;
-    height: 1.5em;
-    fill: #4fc08d;
-  }
-}
-
 #dock {
   width: 100%;
   height: 90px;

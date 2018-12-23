@@ -63,9 +63,6 @@ export default {
 
   .listitem {
     display: block;
-    color: inherit;
-    text-decoration: none;
-
     margin: 0 -10px;
     padding: 10px;
     cursor: pointer;

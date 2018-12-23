@@ -100,6 +100,7 @@ export default {
   }
 
   .listitem {
+    display: block;
     margin: 0 -10px;
     padding: 10px;
     cursor: pointer;
