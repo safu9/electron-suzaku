@@ -1,4 +1,5 @@
 const state = {
+  targetID: null,
   tracks: [],
   index: 0,
   time: 0,
@@ -13,6 +14,9 @@ const state = {
 }
 
 const mutations = {
+  setTargetID (state, id) {
+    state.targetID = id
+  },
   setTracks (state, tracks) {
     state.tracks = tracks
   },
@@ -61,6 +65,17 @@ const mutations = {
 }
 
 const actions = {
+  setTarget ({ commit, dispatch, state }, params) {
+    commit('setTargetID', params.targetID)
+    commit('setTracks', params.tracks)
+    commit('setIsPlaying', false)
+
+    if (state.isShuffling) {
+      commit('updateShuffleList')
+    }
+
+    dispatch('setCurrentIndex', params.index || 0)
+  },
   initPlayer ({ commit, dispatch, state, getters }, startPlay) {
     if (!getters.currentTrack) {
       return

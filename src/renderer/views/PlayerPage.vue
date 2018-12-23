@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import SvgIcon from '@/components/SvgIcon'
 
 export default {
@@ -51,26 +51,25 @@ export default {
     })
   },
   methods: {
-    ...mapMutations('playlist', [
-      'setTracks',
-      'setIndex'
-    ]),
     ...mapActions('playlist', [
-      'initPlayer',
+      'setTarget',
+      'togglePlay',
       'setCurrentIndex'
     ]),
 
     selectFolder () {
       this.$electron.ipcRenderer.send('select_folder')
     },
-    onFolderSelected (tracks) {
-      if (!tracks) {
+    onFolderSelected (data) {
+      if (!data || !data.tracks) {
         return
       }
 
-      this.setTracks(tracks)
-      this.setIndex(0)
-      this.initPlayer(true)
+      this.setTarget({
+        targetID: data.dir,
+        tracks: data.tracks
+      })
+      this.togglePlay()
     }
   }
 }

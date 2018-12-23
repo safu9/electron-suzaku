@@ -166,9 +166,13 @@ function openFolder () {
   dialog.showOpenDialog({ properties: ['openDirectory'] }, async (dirs) => {
     if (dirs) {
       const db = new DB(app.getPath('userData'))
-      const tracks = await db.scanDir(dirs[0])
 
-      mainWindow.webContents.send('selected_folder', tracks)
+      const data = {
+        dir: dirs[0],
+        tracks: await db.scanDir(dirs[0])
+      }
+
+      mainWindow.webContents.send('selected_folder', data)
       loadData()
     }
   })

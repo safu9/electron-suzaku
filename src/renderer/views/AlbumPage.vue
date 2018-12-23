@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import SvgIcon from '@/components/SvgIcon'
 
 export default {
@@ -39,6 +39,7 @@ export default {
   },
   computed: {
     ...mapState('playlist', {
+      targetID: 'targetID',
       playingTracks: 'tracks',
       isPlaying: 'isPlaying'
     }),
@@ -53,12 +54,8 @@ export default {
     this.$electron.ipcRenderer.send('load_album', this.$route.params.id)
   },
   methods: {
-    ...mapMutations('playlist', [
-      'setTracks',
-      'setIndex'
-    ]),
     ...mapActions('playlist', [
-      'initPlayer',
+      'setTarget',
       'setCurrentIndex',
       'togglePlay'
     ]),
@@ -73,14 +70,17 @@ export default {
     },
 
     playTrack (index) {
-      if (this.tracks[index] === this.currentTrack) {
+      if (this.tracks[index]._id === this.currentTrack._id) {
         this.togglePlay()
-      } else if (this.tracks === this.playingTracks) {
+      } else if (this.targetID === this.album._id) {
         this.setCurrentIndex(index)
       } else {
-        this.setTracks(this.tracks)
-        this.setIndex(0)
-        this.initPlayer(true)
+        this.setTarget({
+          targetID: this.album._id,
+          tracks: this.tracks,
+          index: index
+        })
+        this.togglePlay()
       }
     }
   }

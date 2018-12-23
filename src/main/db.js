@@ -84,14 +84,17 @@ export default class {
         })
     )
 
-    const newAlbums = []
-    const newArtists = []
+    let newAlbums = []
+    let newArtists = []
 
     for (const track of newTracks) {
       if (track.album) {
-        let album = newAlbums.find(i => (i.type === 'album' && i.album === track.album))
+        let album = newAlbums.find(i => (i.album === track.album))
         if (!album) {
           album = await this.db.findOne({type: 'album', album: track.album})
+          if (album) {
+            track.albumid = album._id
+          }
         }
 
         if (!album) {
@@ -109,9 +112,12 @@ export default class {
       }
 
       if (track.artist) {
-        let artist = newArtists.find(i => (i.type === 'artist' && i.artist === track.artist))
+        let artist = newArtists.find(i => (i.artist === track.artist))
         if (!artist) {
           artist = await this.db.findOne({type: 'artist', artist: track.artist})
+          if (artist) {
+            track.artistid = artist._id
+          }
         }
 
         if (!artist) {
@@ -126,8 +132,21 @@ export default class {
       }
     }
 
-    const newData = newTracks.concat(newAlbums, newArtists)
-    await this.db.insert(newData)
+    newAlbums = await this.db.insert(newAlbums)
+    for (const album of newAlbums) {
+      newTracks.filter((t) => (t.album === album.album)).map((t) => {
+        t.albumid = album._id
+      })
+    }
+
+    newArtists = await this.db.insert(newArtists)
+    for (const artist of newArtists) {
+      newTracks.filter((t) => (t.artist === artist.artist)).map((t) => {
+        t.artistid = artist._id
+      })
+    }
+
+    await this.db.insert(newTracks)
 
     return tracks
   }
