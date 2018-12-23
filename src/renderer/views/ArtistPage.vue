@@ -1,19 +1,17 @@
 <template>
-  <div id="main">
-    <div id="library">
-      <router-link :to="{ name: 'top' }">top</router-link>
+  <div id="artist-page">
+    <router-link :to="{ name: 'top' }">top</router-link>
 
-      <div>
-        <p id="song-title">{{ artist.artist }}</p>
-      </div>
-
-      <hr>
-
-      <router-link v-for="(album, i) in albums" :key="album._id"
-         :to="{ name: 'album', params: { id: album._id }}" class="listitem">
-        <span class="item-name">{{ album.album }}</span>
-      </router-link>
+    <div>
+      <p id="song-title">{{ artist.artist }}</p>
     </div>
+
+    <hr>
+
+    <router-link v-for="(album, i) in albums" :key="album._id"
+       :to="{ name: 'album', params: { id: album._id }}" class="listitem">
+      <span class="item-name">{{ album.album }}</span>
+    </router-link>
   </div>
 </template>
 
@@ -50,27 +48,7 @@ export default {
 </script>
 
 <style lang="scss">
-#main {
-  background:
-    radial-gradient(
-      ellipse at top left,
-      rgba(255, 255, 255, 1) 40%,
-      rgba(229, 229, 229, .9) 100%
-    );
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-#library {
-  flex: 1;
-  width: 100%;
-  padding: 20px 40px;
-  overflow-x: hidden;
-  overflow-y: scroll;
-
+#artist-page {
   #song-title {
     font-size: 1.2em;
     font-weight: bold;

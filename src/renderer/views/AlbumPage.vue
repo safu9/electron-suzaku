@@ -1,23 +1,21 @@
 <template>
-  <div id="main">
-    <div id="library">
-      <router-link :to="{ name: 'top' }">top</router-link>
+  <div id="album-page">
+    <router-link :to="{ name: 'top' }">top</router-link>
 
-      <div class="clearfix">
-        <img id="artwork" :src="album.picture ? ('file://' + album.picture) : 'static/blank.png'" />
-        <p id="song-title">{{ album.album }}</p>
-        <p>
-          <span v-show="album.artist">{{ album.albumartist || album.artist }}</span>
-        </p>
-      </div>
-
-      <hr>
-
-      <p v-for="(track, i) in tracks" :key="track._id" class="listitem">
-        <span class="item-index">{{ track.track.no || i+1 }}</span>
-        <span class="item-name">{{ track.title || track.filename }}</span>
+    <div class="clearfix">
+      <img id="artwork" :src="album.picture ? ('file://' + album.picture) : 'static/blank.png'" />
+      <p id="song-title">{{ album.album }}</p>
+      <p>
+        <span v-show="album.artist">{{ album.albumartist || album.artist }}</span>
       </p>
     </div>
+
+    <hr>
+
+    <p v-for="(track, i) in tracks" :key="track._id" class="listitem">
+      <span class="item-index">{{ track.track.no || i+1 }}</span>
+      <span class="item-name">{{ track.title || track.filename }}</span>
+    </p>
   </div>
 </template>
 
@@ -54,27 +52,7 @@ export default {
 </script>
 
 <style lang="scss">
-#main {
-  background:
-    radial-gradient(
-      ellipse at top left,
-      rgba(255, 255, 255, 1) 40%,
-      rgba(229, 229, 229, .9) 100%
-    );
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-#library {
-  flex: 1;
-  width: 100%;
-  padding: 20px 40px;
-  overflow-x: hidden;
-  overflow-y: scroll;
-
+#album-page {
   #artwork {
     width: 100px;
     height: 100px;
