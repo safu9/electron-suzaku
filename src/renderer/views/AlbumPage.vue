@@ -12,17 +12,24 @@
 
     <hr>
 
-    <p v-for="(track, i) in tracks" :key="track._id" class="listitem">
-      <span class="item-index">{{ track.track.no || i+1 }}</span>
+    <p v-for="(track, i) in tracks" :key="track._id" class="listitem" @click="playTrack(i)">
+      <span v-if="track._id === currentTrack._id" class="item-index item-index-playing">
+        <SvgIcon :icon="isPlaying ? 'play' : 'pause'" />
+      </span>
+      <span v-else class="item-index">{{ track.track.no || i+1 }}</span>
       <span class="item-name">{{ track.title || track.filename }}</span>
     </p>
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
+import SvgIcon from '@/components/SvgIcon'
+
 export default {
   name: 'album-page',
   components: {
+    SvgIcon
   },
   data () {
     return {
@@ -31,6 +38,13 @@ export default {
     }
   },
   computed: {
+    ...mapState('playlist', {
+      playingTracks: 'tracks',
+      isPlaying: 'isPlaying'
+    }),
+    ...mapGetters('playlist', [
+      'currentTrack'
+    ])
   },
   mounted () {
     this.$electron.ipcRenderer.on('album_loaded', (_event, arg) => {
@@ -39,6 +53,16 @@ export default {
     this.$electron.ipcRenderer.send('load_album', this.$route.params.id)
   },
   methods: {
+    ...mapMutations('playlist', [
+      'setTracks',
+      'setIndex'
+    ]),
+    ...mapActions('playlist', [
+      'initPlayer',
+      'setCurrentIndex',
+      'togglePlay'
+    ]),
+
     onDataLoaded (data) {
       if (!data) {
         return
@@ -46,6 +70,18 @@ export default {
 
       this.album = data.album
       this.tracks = data.tracks
+    },
+
+    playTrack (index) {
+      if (this.tracks[index] === this.currentTrack) {
+        this.togglePlay()
+      } else if (this.tracks === this.playingTracks) {
+        this.setCurrentIndex(index)
+      } else {
+        this.setTracks(this.tracks)
+        this.setIndex(0)
+        this.initPlayer(true)
+      }
     }
   }
 }

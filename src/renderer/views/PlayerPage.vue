@@ -15,7 +15,9 @@
     <hr>
 
     <p v-for="(track, i) in tracks" :key="track.path" class="listitem" @click="setCurrentIndex(i)">
-      <span v-if="i == currentIndex" class="item-index item-index-playing"><SvgIcon :icon="isPlaying ? 'play' : 'pause'"></SvgIcon></span>
+      <span v-if="track._id === currentTrack._id" class="item-index item-index-playing">
+        <SvgIcon :icon="isPlaying ? 'play' : 'pause'" />
+      </span>
       <span v-else class="item-index">{{ track.track.no || i+1 }}</span>
       <span class="item-name">{{ track.title || track.filename }}</span>
     </p>
@@ -40,7 +42,6 @@ export default {
       'isPlaying'
     ]),
     ...mapGetters('playlist', [
-      'currentIndex',
       'currentTrack'
     ])
   },
