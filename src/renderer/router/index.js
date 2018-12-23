@@ -7,12 +7,17 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'top-page',
+      name: 'top',
       component: require('@/views/TopPage').default
     },
     {
+      path: '/album/:id',
+      name: 'album',
+      component: require('@/views/AlbumPage').default
+    },
+    {
       path: '/player',
-      name: 'player-page',
+      name: 'player',
       component: require('@/views/PlayerPage').default
     },
     {

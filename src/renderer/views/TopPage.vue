@@ -13,9 +13,10 @@
 
       <hr>
 
-      <p v-for="(album, i) in albums" :key="album._id" class="listitem">
+      <router-link v-for="(album, i) in albums" :key="album._id"
+         :to="{ name: 'album', params: { id: album._id }}" class="listitem">
         <span class="item-name">{{ album.album }}</span>
-      </p>
+      </router-link>
     </div>
   </div>
 </template>
@@ -80,6 +81,10 @@ export default {
   }
 
   .listitem {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+
     margin: 0 -10px;
     padding: 10px;
     cursor: pointer;

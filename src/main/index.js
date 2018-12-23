@@ -109,11 +109,32 @@ async function loadData () {
 
   try {
     const data = {
-      artists: await db.getArtists({}),
-      albums: await db.getAlbums({})
+      artists: await db.getArtists({}).exec(),
+      albums: await db.getAlbums({}).exec()
     }
 
     mainWindow.webContents.send('data_loaded', data)
+  } catch (err) {
+    console.log(err.message)
+  }
+}
+
+ipcMain.on('load_album', loadAlbum)
+async function loadAlbum (_event, arg) {
+  const db = new DB(app.getPath('userData'))
+
+  try {
+    const albums = await db.getAlbums({_id: arg}).exec()
+    if (!albums || albums.length === 0) {
+      return
+    }
+
+    const data = {
+      album: albums[0],
+      tracks: await db.getTracks({album: albums[0].album}).sort({track: 1}).exec()
+    }
+
+    mainWindow.webContents.send('album_loaded', data)
   } catch (err) {
     console.log(err.message)
   }

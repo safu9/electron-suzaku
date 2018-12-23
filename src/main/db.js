@@ -132,14 +132,19 @@ export default class {
     return tracks
   }
 
+  getTracks (query) {
+    query.type = 'track'
+    return this.db.cfind(query)
+  }
+
   getAlbums (query) {
     query.type = 'album'
-    return this.db.cfind(query).sort({ albumsort: 1 }).exec()
+    return this.db.cfind(query).sort({ albumsort: 1 })
   }
 
   getArtists (query) {
     query.type = 'artist'
-    return this.db.cfind(query).sort({ artistsort: 1 }).exec()
+    return this.db.cfind(query).sort({ artistsort: 1 })
   }
 
   clean () {
