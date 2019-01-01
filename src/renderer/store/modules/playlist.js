@@ -203,7 +203,7 @@ const getters = {
     return min + ':' + (sec < 10 ? '0' : '') + sec
   },
   durationString: (state, getters) => {
-    if (!getters.currentTrack) {
+    if (!getters.currentTrack || !getters.currentTrack.duration) {
       return '0:00'
     }
     const min = Math.floor(getters.currentTrack.duration / 60)
