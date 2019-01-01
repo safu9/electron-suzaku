@@ -1,12 +1,16 @@
 <template>
   <div id="app">
     <div id="main">
+      <div id="sidemenu">
+        <router-link :to="{ name: 'top' }">top</router-link>
+        <router-link :to="{ name: 'player' }">player</router-link>
+      </div>
+
       <div id="library">
         <router-view></router-view>
       </div>
-
-      <Dock />
     </div>
+    <Dock />
   </div>
 </template>
 
@@ -28,6 +32,10 @@ export default {
 #app {
   width: 100vw;
   height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 #main {
@@ -37,11 +45,20 @@ export default {
       rgba(255, 255, 255, 1) 40%,
       rgba(229, 229, 229, .9) 100%
     );
+  flex: 1;
   width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
+}
+
+#sidemenu {
+  width: 150px;
+  padding: 32px 20px;
+  overflow-y: auto;
+
+  a {
+    display: block;
+    margin-bottom: .5rem;
+  }
 }
 
 #library {

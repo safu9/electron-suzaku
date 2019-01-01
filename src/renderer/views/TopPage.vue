@@ -1,7 +1,5 @@
 <template>
   <div id="top-page">
-    <router-link :to="{ name: 'player' }">player</router-link>
-
     <div class="clearfix">
       <p id="song-title">Suzaku</p>
     </div>

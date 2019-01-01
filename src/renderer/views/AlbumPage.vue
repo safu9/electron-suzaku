@@ -1,7 +1,5 @@
 <template>
   <div id="album-page">
-    <router-link :to="{ name: 'top' }">top</router-link>
-
     <div class="clearfix">
       <img id="artwork" :src="album.picture ? ('file://' + album.picture) : 'static/blank.png'" />
       <p id="song-title">{{ album.album }}</p>

@@ -1,7 +1,5 @@
 <template>
   <div id="artist-page">
-    <router-link :to="{ name: 'top' }">top</router-link>
-
     <div>
       <p id="song-title">{{ artist.artist }}</p>
     </div>
