@@ -26,13 +26,11 @@ export default {
   computed: {
   },
   mounted () {
-    this.$electron.ipcRenderer.on('artist_list_loaded', (_event, arg) => {
-      this.onDataLoaded(arg)
-    })
+    this.$electron.ipcRenderer.once('artist_list_loaded', this.onDataLoaded)
     this.$electron.ipcRenderer.send('load_artist_list')
   },
   methods: {
-    onDataLoaded (data) {
+    onDataLoaded (_event, data) {
       if (!data) {
         return
       }

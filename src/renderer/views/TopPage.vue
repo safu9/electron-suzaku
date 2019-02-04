@@ -34,13 +34,14 @@ export default {
   computed: {
   },
   mounted () {
-    this.$electron.ipcRenderer.on('data_loaded', (_event, arg) => {
-      this.onDataLoaded(arg)
-    })
+    this.$electron.ipcRenderer.on('data_loaded', this.onDataLoaded)
     this.$electron.ipcRenderer.send('load_data')
   },
+  beforeDestroy () {
+    this.$electron.ipcRenderer.off('data_loaded', this.onDataLoaded)
+  },
   methods: {
-    onDataLoaded (data) {
+    onDataLoaded (_event, data) {
       if (!data) {
         return
       }

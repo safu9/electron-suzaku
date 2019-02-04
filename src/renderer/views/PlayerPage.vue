@@ -46,9 +46,10 @@ export default {
     ])
   },
   mounted () {
-    this.$electron.ipcRenderer.on('selected_folder', (_event, arg) => {
-      this.onFolderSelected(arg)
-    })
+    this.$electron.ipcRenderer.on('selected_folder', this.onFolderSelected)
+  },
+  beforeDestroy () {
+    this.$electron.ipcRenderer.off('selected_folder', this.onFolderSelected)
   },
   methods: {
     ...mapActions('playlist', [
@@ -60,7 +61,7 @@ export default {
     selectFolder () {
       this.$electron.ipcRenderer.send('select_folder')
     },
-    onFolderSelected (data) {
+    onFolderSelected (_event, data) {
       if (!data || !data.tracks) {
         return
       }

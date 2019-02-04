@@ -27,13 +27,11 @@ export default {
   computed: {
   },
   mounted () {
-    this.$electron.ipcRenderer.on('artist_loaded', (_event, arg) => {
-      this.onDataLoaded(arg)
-    })
+    this.$electron.ipcRenderer.once('artist_loaded', this.onDataLoaded)
     this.$electron.ipcRenderer.send('load_artist', this.$route.params.id)
   },
   methods: {
-    onDataLoaded (data) {
+    onDataLoaded (_event, data) {
       if (!data) {
         return
       }

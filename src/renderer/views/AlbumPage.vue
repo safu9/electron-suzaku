@@ -46,9 +46,7 @@ export default {
     ])
   },
   mounted () {
-    this.$electron.ipcRenderer.on('album_loaded', (_event, arg) => {
-      this.onDataLoaded(arg)
-    })
+    this.$electron.ipcRenderer.once('album_loaded', this.onDataLoaded)
     this.$electron.ipcRenderer.send('load_album', this.$route.params.id)
   },
   methods: {
@@ -58,7 +56,7 @@ export default {
       'togglePlay'
     ]),
 
-    onDataLoaded (data) {
+    onDataLoaded (_event, data) {
       if (!data) {
         return
       }

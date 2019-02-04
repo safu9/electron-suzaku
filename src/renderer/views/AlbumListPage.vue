@@ -31,13 +31,11 @@ export default {
   computed: {
   },
   mounted () {
-    this.$electron.ipcRenderer.on('album_list_loaded', (_event, arg) => {
-      this.onDataLoaded(arg)
-    })
+    this.$electron.ipcRenderer.once('album_list_loaded', this.onDataLoaded)
     this.$electron.ipcRenderer.send('load_album_list')
   },
   methods: {
-    onDataLoaded (data) {
+    onDataLoaded (_event, data) {
       if (!data) {
         return
       }
