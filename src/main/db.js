@@ -72,7 +72,7 @@ export default class {
 
             track.type = 'track'
             track.path = filePath
-            track.filename = filename
+            track.filename = path.parse(filename).name
             track.timestamp = timestamp
 
             newTracks.push(track)
