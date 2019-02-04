@@ -1,7 +1,7 @@
 'use strict'
 
-import { app, dialog, ipcMain, BrowserWindow, Menu } from 'electron'
-import DB from './db'
+import { app, BrowserWindow, Menu } from 'electron'
+import IPC from './ipc'
 
 const isDevelopment = (process.env.NODE_ENV === 'development')
 
@@ -45,6 +45,9 @@ function createWindow () {
     mainWindow = null
   })
 
+  const ipc = new IPC(mainWindow.webContents)
+  ipc.init()
+
   const template = [
     {
       label: 'File',
@@ -52,7 +55,7 @@ function createWindow () {
         {
           label: 'Open Folder',
           accelerator: 'CmdOrCtrl + O',
-          click: openFolder
+          click: ipc.openFolder.bind(ipc)
         },
         {
           type: 'separator'
@@ -102,81 +105,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-ipcMain.on('load_data', loadData)
-async function loadData () {
-  const db = new DB(app.getPath('userData'))
-
-  try {
-    const data = {
-      artists: await db.getArtists({}).exec(),
-      albums: await db.getAlbums({}).exec()
-    }
-
-    mainWindow.webContents.send('data_loaded', data)
-  } catch (err) {
-    console.log(err.message)
-  }
-}
-
-ipcMain.on('load_album', loadAlbum)
-async function loadAlbum (_event, arg) {
-  const db = new DB(app.getPath('userData'))
-
-  try {
-    const albums = await db.getAlbums({_id: arg}).exec()
-    if (!albums || albums.length === 0) {
-      return
-    }
-
-    const data = {
-      album: albums[0],
-      tracks: await db.getTracks({album: albums[0].album}).sort({track: 1}).exec()
-    }
-
-    mainWindow.webContents.send('album_loaded', data)
-  } catch (err) {
-    console.log(err.message)
-  }
-}
-
-ipcMain.on('load_artist', loadArtist)
-async function loadArtist (_event, arg) {
-  const db = new DB(app.getPath('userData'))
-
-  try {
-    const artists = await db.getArtists({_id: arg}).exec()
-    if (!artists || artists.length === 0) {
-      return
-    }
-
-    const data = {
-      artist: artists[0],
-      albums: await db.getAlbums({artist: artists[0].artist}).sort({album: 1}).exec()
-    }
-
-    mainWindow.webContents.send('artist_loaded', data)
-  } catch (err) {
-    console.log(err.message)
-  }
-}
-
-ipcMain.on('select_folder', openFolder)
-function openFolder () {
-  dialog.showOpenDialog({ properties: ['openDirectory'] }, async (dirs) => {
-    if (dirs) {
-      const db = new DB(app.getPath('userData'))
-
-      const data = {
-        dir: dirs[0],
-        tracks: await db.scanDir(dirs[0])
-      }
-
-      mainWindow.webContents.send('selected_folder', data)
-      loadData()
-    }
-  })
-}
 
 /**
  * Auto Updater
