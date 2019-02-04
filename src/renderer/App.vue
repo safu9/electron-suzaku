@@ -2,8 +2,10 @@
   <div id="app">
     <div id="main">
       <div id="sidemenu">
-        <router-link :to="{ name: 'top' }">top</router-link>
-        <router-link :to="{ name: 'player' }">player</router-link>
+        <router-link :to="{ name: 'top' }">Top</router-link>
+        <router-link :to="{ name: 'artist-list' }">Artists</router-link>
+        <router-link :to="{ name: 'album-list' }">Albums</router-link>
+        <router-link :to="{ name: 'player' }">Player</router-link>
       </div>
 
       <div id="library">
@@ -52,12 +54,16 @@ export default {
 
 #sidemenu {
   width: 150px;
-  padding: 32px 20px;
+  padding: 32px 16px;
   overflow-y: auto;
 
   a {
     display: block;
-    margin-bottom: .5rem;
+    padding: .5rem;
+    transition: background-color .2s ease;
+    &:hover {
+      background-color: rgba(0, 0, 0, .03);
+    }
   }
 }
 

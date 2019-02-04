@@ -9,6 +9,8 @@ export default class {
 
   init () {
     ipcMain.on('load_data', this.loadData.bind(this))
+    ipcMain.on('load_album_list', this.loadAlbumList.bind(this))
+    ipcMain.on('load_artist_list', this.loadArtistList.bind(this))
     ipcMain.on('load_album', this.loadAlbum.bind(this))
     ipcMain.on('load_artist', this.loadArtist.bind(this))
     ipcMain.on('select_folder', this.openFolder.bind(this))
@@ -22,6 +24,30 @@ export default class {
       }
 
       this.renderer.send('data_loaded', data)
+    } catch (err) {
+      console.log(err.message)
+    }
+  }
+
+  async loadAlbumList (_event) {
+    try {
+      const data = {
+        albums: await this.db.getAlbums({}).exec()
+      }
+
+      this.renderer.send('album_list_loaded', data)
+    } catch (err) {
+      console.log(err.message)
+    }
+  }
+
+  async loadArtistList (_event) {
+    try {
+      const data = {
+        artists: await this.db.getArtists({}).exec()
+      }
+
+      this.renderer.send('artist_list_loaded', data)
     } catch (err) {
       console.log(err.message)
     }

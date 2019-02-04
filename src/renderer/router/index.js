@@ -11,14 +11,24 @@ export default new Router({
       component: require('@/views/TopPage').default
     },
     {
-      path: '/album/:id',
-      name: 'album',
-      component: require('@/views/AlbumPage').default
+      path: '/artist',
+      name: 'artist-list',
+      component: require('@/views/ArtistListPage').default
+    },
+    {
+      path: '/album',
+      name: 'album-list',
+      component: require('@/views/AlbumListPage').default
     },
     {
       path: '/artist/:id',
       name: 'artist',
       component: require('@/views/ArtistPage').default
+    },
+    {
+      path: '/album/:id',
+      name: 'album',
+      component: require('@/views/AlbumPage').default
     },
     {
       path: '/player',
