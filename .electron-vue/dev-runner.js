@@ -15,26 +15,19 @@ let electronProcess = null
 let manualRestart = false
 let hotMiddleware
 
-function logStats (proc, data) {
-  let log = ''
+init()
 
-  log += chalk.yellow.bold(`┏ ${proc} Process ${new Array((19 - proc.length) + 1).join('-')}`)
-  log += '\n'
+function init () {
+  console.log(chalk.yellow.bold('electron-vue'))
+  console.log(chalk.white('getting ready...') + '\n')
 
-  if (typeof data === 'object') {
-    data.toString({
-      colors: true,
-      chunks: false
-    }).split(/\r?\n/).forEach(line => {
-      log += '  ' + line + '\n'
+  Promise.all([startRenderer(), startMain()])
+    .then(() => {
+      startElectron()
     })
-  } else {
-    log += `  ${data}\n`
-  }
-
-  log += chalk.yellow.bold(`┗ ${new Array(28 + 1).join('-')}`) + '\n'
-
-  console.log(log)
+    .catch(err => {
+      console.error(err)
+    })
 }
 
 function startRenderer () {
@@ -116,10 +109,10 @@ function startElectron () {
   electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../dist/electron/main.js')])
 
   electronProcess.stdout.on('data', data => {
-    electronLog(data, 'blue')
+    electronLogStats(data, 'green')
   })
   electronProcess.stderr.on('data', data => {
-    electronLog(data, 'red')
+    electronLogStats(data, 'red')
   })
 
   electronProcess.on('close', () => {
@@ -127,38 +120,37 @@ function startElectron () {
   })
 }
 
-function electronLog (data, color) {
+function logStats (proc, data) {
   let log = ''
-  data = data.toString().split(/\r?\n/)
-  data.forEach(line => {
-    if (line) log += `  ${line}\n`
+  if (typeof data === 'object') {
+    data.toString({
+      colors: true,
+      chunks: false
+    }).split(/\r?\n/).forEach(line => {
+      log += ' ' + line + '\n'
+    })
+  } else {
+    log += ' ' + data + '\n'
+  }
+
+  console.log(
+    chalk.bgGreen.white.bold(' ' + proc + ' Process ') + ' ' + (new Array(30 - proc.length)).join('-') + '\n' +
+    log + '\n'
+  )
+}
+
+function electronLogStats (data, color) {
+  let log = ''
+  data.toString().split(/\r?\n/).forEach(line => {
+    if (line) {
+      log += ' ' + line + '\n'
+    }
   })
+
   if (/[0-9A-z]+/.test(log)) {
     console.log(
-      chalk[color].bold('┏ Electron -------------------') +
-      '\n' +
-      log +
-      chalk[color].bold('┗ ----------------------------') +
-      '\n'
+      chalk.bgKeyword(color).white.bold(' Electron ') + ' ' + (new Array(30)).join('-') + '\n' +
+      log + '\n'
     )
   }
 }
-
-function greeting () {
-  console.log(chalk.yellow.bold('  electron-vue'))
-  console.log(chalk.blue('  getting ready...') + '\n')
-}
-
-function init () {
-  greeting()
-
-  Promise.all([startRenderer(), startMain()])
-    .then(() => {
-      startElectron()
-    })
-    .catch(err => {
-      console.error(err)
-    })
-}
-
-init()
