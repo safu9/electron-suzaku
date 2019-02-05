@@ -6,7 +6,7 @@
 
     <hr>
 
-    <router-link v-for="(album, i) in albums" :key="album._id"
+    <router-link v-for="album in albums" :key="album._id"
        :to="{ name: 'album', params: { id: album._id }}" class="listitem">
       <span class="item-name">{{ album.album }}</span>
     </router-link>

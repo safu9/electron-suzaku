@@ -55,14 +55,14 @@ export default class {
 
   async loadAlbum (_event, arg) {
     try {
-      const albums = await this.db.getAlbums({_id: arg}).exec()
+      const albums = await this.db.getAlbums({ _id: arg }).exec()
       if (!albums || albums.length === 0) {
         return
       }
 
       const data = {
         album: albums[0],
-        tracks: await this.db.getTracks({album: albums[0].album}).sort({track: 1}).exec()
+        tracks: await this.db.getTracks({ album: albums[0].album }).sort({ track: 1 }).exec()
       }
 
       this.renderer.send('album_loaded', data)
@@ -73,14 +73,14 @@ export default class {
 
   async loadArtist (_event, arg) {
     try {
-      const artists = await this.db.getArtists({_id: arg}).exec()
+      const artists = await this.db.getArtists({ _id: arg }).exec()
       if (!artists || artists.length === 0) {
         return
       }
 
       const data = {
         artist: artists[0],
-        albums: await this.db.getAlbums({artist: artists[0].artist}).sort({album: 1}).exec()
+        albums: await this.db.getAlbums({ artist: artists[0].artist }).sort({ album: 1 }).exec()
       }
 
       this.renderer.send('artist_loaded', data)

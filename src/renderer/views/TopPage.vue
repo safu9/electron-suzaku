@@ -6,14 +6,14 @@
 
     <hr>
 
-    <router-link v-for="(artist, i) in artists" :key="artist._id"
+    <router-link v-for="artist in artists" :key="artist._id"
        :to="{ name: 'artist', params: { id: artist._id }}" class="listitem">
       <span class="item-name">{{ artist.artist }}</span>
     </router-link>
 
     <hr>
 
-    <router-link v-for="(album, i) in albums" :key="album._id"
+    <router-link v-for="album in albums" :key="album._id"
        :to="{ name: 'album', params: { id: album._id }}" class="listitem">
       <span class="item-name">{{ album.album }}</span>
     </router-link>

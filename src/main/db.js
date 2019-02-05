@@ -41,18 +41,18 @@ export default class {
           const filePath = path.join(dir, filename)
           const timestamp = fs.statSync(filePath).mtimeMs
 
-          const doc = await this.db.findOne({path: filePath})
+          const doc = await this.db.findOne({ path: filePath })
           if (doc) {
             if (doc.timestamp === timestamp) {
               return doc
             } else {
-              await this.db.remove({path: filePath})
+              await this.db.remove({ path: filePath })
             }
           }
 
           let track = {}
           try {
-            const metadata = await mm.parseFile(filePath, {native: true})
+            const metadata = await mm.parseFile(filePath, { native: true })
 
             if (metadata.common.picture) {
               const pic = metadata.common.picture[0]
@@ -91,7 +91,7 @@ export default class {
       if (track.album) {
         let album = newAlbums.find(i => (i.album === track.album))
         if (!album) {
-          album = await this.db.findOne({type: 'album', album: track.album})
+          album = await this.db.findOne({ type: 'album', album: track.album })
           if (album) {
             track.albumid = album._id
           }
@@ -114,7 +114,7 @@ export default class {
       if (track.artist) {
         let artist = newArtists.find(i => (i.artist === track.artist))
         if (!artist) {
-          artist = await this.db.findOne({type: 'artist', artist: track.artist})
+          artist = await this.db.findOne({ type: 'artist', artist: track.artist })
           if (artist) {
             track.artistid = artist._id
           }

@@ -7,7 +7,7 @@
     <hr>
 
     <div id="album-list">
-      <router-link v-for="(album, i) in albums" :key="album._id"
+      <router-link v-for="album in albums" :key="album._id"
          :to="{ name: 'album', params: { id: album._id }}" class="listitem">
         <figure class="item-artwork-wrap">
           <img class="item-artwork" :src="album.picture ? ('file://' + album.picture) : 'static/blank.png'" />
