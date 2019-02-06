@@ -17,12 +17,19 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import Dock from '@/components/Dock'
 
 export default {
   name: 'suzaku',
   components: {
     Dock
+  },
+  beforeMount () {
+    this.loadPlaylistSettings()
+  },
+  methods: {
+    ...mapActions('playlist', { loadPlaylistSettings: 'loadSettings' })
   }
 }
 </script>

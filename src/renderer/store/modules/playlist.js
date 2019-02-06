@@ -1,3 +1,5 @@
+const settings = require('electron-settings')
+
 const state = {
   targetID: null,
   tracks: [],
@@ -169,6 +171,8 @@ const actions = {
     } else {
       commit('setIsRepeating', true)
     }
+
+    settings.set('playlist.repeat', state.isRepeating)
   },
   toggleShuffle ({ commit, state }) {
     commit('setIsShuffling', !state.isShuffling)
@@ -179,6 +183,8 @@ const actions = {
       commit('setIndex', state.shuffleList[state.index])
       commit('clearShuffleList')
     }
+
+    settings.set('playlist.shuffle', state.isShuffling)
   },
   updateTime ({ commit, state }) {
     if (state.audio) {
@@ -186,6 +192,12 @@ const actions = {
     } else {
       commit('setTime', 0)
     }
+  },
+
+  loadSettings ({ commit }) {
+    console.log(settings.file())
+    commit('setIsRepeating', settings.get('playlist.repeat', false))
+    commit('setIsShuffling', settings.get('playlist.shuffle', false))
   }
 }
 
