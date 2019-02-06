@@ -1,15 +1,20 @@
 <template>
   <div id="artist-page">
     <div>
-      <p id="song-title">{{ artist.artist }}</p>
+      <p id="title">{{ artist.artist }}</p>
     </div>
 
     <hr>
 
-    <router-link v-for="album in albums" :key="album._id"
-       :to="{ name: 'album', params: { id: album._id }}" class="listitem">
-      <span class="item-name">{{ album.album }}</span>
-    </router-link>
+    <div id="album-list">
+      <router-link v-for="album in albums" :key="album._id"
+         :to="{ name: 'album', params: { id: album._id }}" class="listitem">
+        <figure class="item-artwork-wrap">
+          <img class="item-artwork" :src="album.picture ? ('file://' + album.picture) : 'static/blank.png'" />
+        </figure>
+        <div class="item-name">{{ album.album }}</div>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -45,36 +50,51 @@ export default {
 
 <style lang="scss">
 #artist-page {
-  #song-title {
+  #title {
     font-size: 1.2em;
     font-weight: bold;
   }
 
+  #album-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+  }
+
   .listitem {
     display: block;
-    margin: 0 -10px;
+    width: 25%;
     padding: 10px;
     cursor: pointer;
     transition: background-color .2s ease;
-    font-size: 16px;
-    line-height: 22px;
+
     &:hover {
       background-color: rgba(0, 0, 0, .03);
     }
+    @media(min-width: 1080px) {
+      width: 20%;
+    }
 
-    .item-index {
-      display: inline-block;
-      width: 2em;
-      padding-right: .5em;
-      text-align: right;
-      vertical-align: middle;
-
-      &-playing {
-        padding-right: .2em;
-      }
+    .item-artwork-wrap {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 100%;
+    }
+    .item-artwork {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
     .item-name {
+      padding: .2rem;
       vertical-align: middle;
+      word-break: break-all;
+      font-size: 16px;
+      line-height: 22px;
+      max-height: 44px;
+      overflow: hidden;
     }
   }
 }
