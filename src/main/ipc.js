@@ -1,5 +1,7 @@
-import { app, dialog, ipcMain } from 'electron'
+import { app, ipcMain } from 'electron'
 import DB from './db'
+
+const settings = require('electron-settings')
 
 export default class {
   constructor (renderer) {
@@ -13,7 +15,7 @@ export default class {
     ipcMain.on('load_artist_list', this.loadArtistList.bind(this))
     ipcMain.on('load_album', this.loadAlbum.bind(this))
     ipcMain.on('load_artist', this.loadArtist.bind(this))
-    ipcMain.on('select_folder', this.openFolder.bind(this))
+    ipcMain.on('scan_dirs', this.scanDirs.bind(this))
   }
 
   async loadData (_event) {
@@ -89,17 +91,13 @@ export default class {
     }
   }
 
-  openFolder (_event) {
-    dialog.showOpenDialog({ properties: ['openDirectory'] }, async (dirs) => {
-      if (dirs) {
-        const data = {
-          dir: dirs[0],
-          tracks: await this.db.scanDir(dirs[0])
-        }
+  async scanDirs (event) {
+    const dirs = settings.get('core.dirs')
+    await this.db.scanDirs(dirs)
+    this.loadData(event)
+  }
 
-        this.renderer.send('selected_folder', data)
-        this.loadData()
-      }
-    })
+  openSettings (_event) {
+    this.renderer.send('open_settings')
   }
 }

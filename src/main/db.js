@@ -31,14 +31,16 @@ export default class {
     this.db.ensureIndex({ fieldName: 'path', unique: true, sparse: true })
   }
 
-  async scanDir (dir) {
-    const files = await readFiles(dir)
+  async scanDirs (dirs) {
+    const files = await Promise.all(
+      dirs.map((dir) => { return readFiles(dir) })
+    )
 
     const supportedExt = ['.mp3', '.aac', '.m4a', '.3gp', '.ogg', '.opus', '.flac', '.wav']
     let newTracks = []
 
     const tracks = await Promise.all(
-      files
+      files.flat()
         .filter(file => {
           const ext = path.extname(file).toLowerCase()
           return supportedExt.includes(ext)

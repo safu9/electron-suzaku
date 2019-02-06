@@ -1,8 +1,6 @@
 <template>
   <div id="player-page">
     <div class="clearfix">
-      <button id="folder-button" @click="selectFolder">Open Folder</button>
-
       <img id="artwork" :src="currentTrack.picture ? ('file://' + currentTrack.picture) : 'static/blank.png'" />
       <p id="song-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</p>
       <p>
@@ -46,47 +44,17 @@ export default {
     ])
   },
   mounted () {
-    this.$electron.ipcRenderer.on('selected_folder', this.onFolderSelected)
-  },
-  beforeDestroy () {
-    this.$electron.ipcRenderer.off('selected_folder', this.onFolderSelected)
   },
   methods: {
     ...mapActions('playlist', [
-      'setTarget',
-      'togglePlay',
       'setCurrentIndex'
-    ]),
-
-    selectFolder () {
-      this.$electron.ipcRenderer.send('select_folder')
-    },
-    onFolderSelected (_event, data) {
-      if (!data || !data.tracks) {
-        return
-      }
-
-      this.setTarget({
-        targetID: data.dir,
-        tracks: data.tracks
-      })
-      this.togglePlay()
-    }
+    ])
   }
 }
 </script>
 
 <style lang="scss">
 #player-page {
-  #folder-button {
-    background-color: #4fc08d;
-    float: right;
-    font-size: .8em;
-    &:hover {
-      background-color: rgba(79,192,141,.85);
-    }
-  }
-
   #artwork {
     width: 100px;
     height: 100px;

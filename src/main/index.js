@@ -53,9 +53,9 @@ function createWindow () {
       label: 'File',
       submenu: [
         {
-          label: 'Open Folder',
-          accelerator: 'CmdOrCtrl + O',
-          click: ipc.openFolder.bind(ipc)
+          label: 'Settings',
+          accelerator: 'CmdOrCtrl + ,',
+          click: ipc.openSettings.bind(ipc)
         },
         {
           type: 'separator'

@@ -6,6 +6,7 @@
         <router-link :to="{ name: 'artist-list' }">Artists</router-link>
         <router-link :to="{ name: 'album-list' }">Albums</router-link>
         <router-link :to="{ name: 'player' }">Player</router-link>
+        <router-link :to="{ name: 'settings' }">Settings</router-link>
       </div>
 
       <div id="library">
@@ -28,8 +29,18 @@ export default {
   beforeMount () {
     this.loadPlaylistSettings()
   },
+  mounted () {
+    this.$electron.ipcRenderer.on('open_settings', this.oepnSettings)
+  },
+  beforeDestroy () {
+    this.$electron.ipcRenderer.off('open_settings', this.oepnSettings)
+  },
   methods: {
-    ...mapActions('playlist', { loadPlaylistSettings: 'loadSettings' })
+    ...mapActions('playlist', { loadPlaylistSettings: 'loadSettings' }),
+
+    oepnSettings () {
+      this.$router.push({ name: 'settings' })
+    }
   }
 }
 </script>
