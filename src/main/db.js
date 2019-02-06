@@ -1,19 +1,25 @@
 const fs = require('fs')
+const fsPromise = require('fs').promises
 const path = require('path')
 const crypto = require('crypto')
 const mm = require('music-metadata')
 const Datastore = require('nedb-promise')
 
-function readdirAsync (path) {
-  return new Promise((resolve, reject) => {
-    fs.readdir(path, (err, files) => {
-      if (err) {
-        reject(err)
+async function readFiles (basePath) {
+  const dirs = await fsPromise.readdir(basePath, { withFileTypes: true })
+
+  const files = await Promise.all(
+    dirs.map(async (dir) => {
+      const dirPath = path.join(basePath, dir.name)
+      if (dir.isDirectory()) {
+        return readFiles(dirPath)
       } else {
-        resolve(files)
+        return dirPath
       }
     })
-  })
+  )
+
+  return files.flat()
 }
 
 export default class {
@@ -26,7 +32,7 @@ export default class {
   }
 
   async scanDir (dir) {
-    const files = await readdirAsync(dir)
+    const files = await readFiles(dir)
 
     const supportedExt = ['.mp3', '.aac', '.m4a', '.3gp', '.ogg', '.opus', '.flac', '.wav']
     let newTracks = []
@@ -37,8 +43,7 @@ export default class {
           const ext = path.extname(file).toLowerCase()
           return supportedExt.includes(ext)
         })
-        .map(async (filename) => {
-          const filePath = path.join(dir, filename)
+        .map(async (filePath) => {
           const timestamp = fs.statSync(filePath).mtimeMs
 
           const doc = await this.db.findOne({ path: filePath })
@@ -72,7 +77,7 @@ export default class {
 
             track.type = 'track'
             track.path = filePath
-            track.filename = path.parse(filename).name
+            track.filename = path.parse(filePath).name
             track.timestamp = timestamp
 
             newTracks.push(track)
