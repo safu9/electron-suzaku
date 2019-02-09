@@ -31,6 +31,12 @@
       </div>
     </div>
     <div id="dock-right">
+      <SvgIcon id="volume-icon"
+        :icon="'volume-' + (volume ? 'low' : 'mute')" />
+      <Seekbar id="volume-bar" color="#4fc08d"
+        :max="100"
+        :value="volume"
+        @change="changeVolume" />
     </div>
   </div>
 </template>
@@ -54,7 +60,8 @@ export default {
       'isPlaying',
       'isRepeating',
       'isShuffling',
-      'audio'
+      'audio',
+      'volume'
     ]),
     ...mapGetters('playlist', [
       'currentIndex',
@@ -69,7 +76,8 @@ export default {
       'toggleRepeat',
       'toggleShuffle',
       'nextSong',
-      'prevSong'
+      'prevSong',
+      'changeVolume'
     ]),
 
     seekSong (val) {
@@ -175,6 +183,18 @@ export default {
 
   #dock-right {
     flex: 1 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    #volume-icon {
+      fill: #fff;
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+    #volume-bar {
+      max-width: 100px;
+    }
   }
 }
 </style>

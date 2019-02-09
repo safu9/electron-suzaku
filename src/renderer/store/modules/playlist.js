@@ -11,8 +11,10 @@ const state = {
   shuffleList: [],
 
   audio: null,
-  audioContext: new AudioContext(),
-  timeIntervalID: null
+  audioContext: null,
+  timeIntervalID: null,
+  audioGainNode: null,
+  volume: 100
 }
 
 const mutations = {
@@ -58,11 +60,21 @@ const mutations = {
     state.index = 0
   },
 
+  initContext (state) {
+    state.audioContext = new AudioContext()
+    state.audioGainNode = state.audioContext.createGain()
+  },
   setAudio (state, audio) {
     state.audio = audio
   },
   setTimeIntervalID (state, id) {
     state.timeIntervalID = id
+  },
+  setVolume (state, volume) {
+    state.volume = volume
+    if (state.audioGainNode) {
+      state.audioGainNode.gain.value = state.volume / 100
+    }
   }
 }
 
@@ -94,8 +106,14 @@ const actions = {
       dispatch('onSongEnded')
     }
 
+    if (!state.audioContext) {
+      commit('initContext')
+      commit('setVolume', state.volume)
+    }
+
     let source = state.audioContext.createMediaElementSource(state.audio)
-    source.connect(state.audioContext.destination)
+    source.connect(state.audioGainNode)
+    state.audioGainNode.connect(state.audioContext.destination)
 
     if (startPlay) {
       dispatch('togglePlay')
@@ -193,11 +211,16 @@ const actions = {
       commit('setTime', 0)
     }
   },
+  changeVolume ({ commit }, volume) {
+    commit('setVolume', volume)
+    settings.set('playlist.volume', state.volume)
+  },
 
   loadSettings ({ commit }) {
     console.log(settings.file())
     commit('setIsRepeating', settings.get('playlist.repeat', false))
     commit('setIsShuffling', settings.get('playlist.shuffle', false))
+    commit('setVolume', settings.get('playlist.volume', 100))
   }
 }
 
