@@ -48,24 +48,60 @@ function createWindow () {
   const ipc = new IPC(mainWindow.webContents)
   ipc.init()
 
+  const onMenuClick = (item, browserWindow, event) => {
+    browserWindow.webContents.send('menu_clicked', item.id)
+  }
   const template = [
     {
       label: 'File',
       submenu: [
         {
+          id: 'settings',
           label: 'Settings',
           accelerator: 'CmdOrCtrl + ,',
-          click: ipc.openSettings.bind(ipc)
+          click: onMenuClick
         },
-        {
-          type: 'separator'
-        },
+        { type: 'separator' },
         {
           label: 'Quit',
           accelerator: 'CmdOrCtrl + Q',
-          click () {
-            app.quit()
-          }
+          click () { app.quit() }
+        }
+      ]
+    },
+    {
+      label: 'Play',
+      submenu: [
+        {
+          id: 'play',
+          label: 'Play / Pause',
+          accelerator: 'Space',
+          click: onMenuClick
+        },
+        {
+          id: 'next',
+          label: 'Next',
+          accelerator: 'CmdOrCtrl + Right',
+          click: onMenuClick
+        },
+        {
+          id: 'previous',
+          label: 'Previous',
+          accelerator: 'CmdOrCtrl + Left',
+          click: onMenuClick
+        },
+        { type: 'separator' },
+        {
+          id: 'turnUp',
+          label: 'Turn Up',
+          accelerator: 'CmdOrCtrl + Up',
+          click: onMenuClick
+        },
+        {
+          id: 'turnDown',
+          label: 'Turn Down',
+          accelerator: 'CmdOrCtrl + Down',
+          click: onMenuClick
         }
       ]
     }

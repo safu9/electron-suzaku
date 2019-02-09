@@ -30,16 +30,42 @@ export default {
     this.loadPlaylistSettings()
   },
   mounted () {
-    this.$electron.ipcRenderer.on('open_settings', this.oepnSettings)
+    this.$electron.ipcRenderer.on('menu_clicked', this.menuClicked)
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === ' ') {
+        e.preventDefault()
+        this.$store.dispatch('playlist/togglePlay')
+      }
+    })
   },
   beforeDestroy () {
-    this.$electron.ipcRenderer.off('open_settings', this.oepnSettings)
+    this.$electron.ipcRenderer.off('menu_clicked', this.menuClicked)
   },
   methods: {
     ...mapActions('playlist', { loadPlaylistSettings: 'loadSettings' }),
 
-    oepnSettings () {
-      this.$router.push({ name: 'settings' })
+    menuClicked (_event, id) {
+      switch (id) {
+        case 'settings':
+          this.$router.push({ name: 'settings' })
+          break
+        case 'play':
+          this.$store.dispatch('playlist/togglePlay')
+          break
+        case 'next':
+          this.$store.dispatch('playlist/nextSong')
+          break
+        case 'previous':
+          this.$store.dispatch('playlist/prevSong')
+          break
+        case 'turnUp':
+          this.$store.dispatch('playlist/turnUp')
+          break
+        case 'turnDown':
+          this.$store.dispatch('playlist/turnDown')
+          break
+      }
     }
   }
 }

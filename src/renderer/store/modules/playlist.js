@@ -71,7 +71,7 @@ const mutations = {
     state.timeIntervalID = id
   },
   setVolume (state, volume) {
-    state.volume = volume
+    state.volume = Math.min(Math.max(volume, 0), 100)
     if (state.audioGainNode) {
       state.audioGainNode.gain.value = state.volume / 100
     }
@@ -215,9 +215,14 @@ const actions = {
     commit('setVolume', volume)
     settings.set('playlist.volume', state.volume)
   },
+  turnUp ({ dispatch, state }) {
+    dispatch('changeVolume', state.volume + 10)
+  },
+  turnDown ({ dispatch, state }) {
+    dispatch('changeVolume', state.volume - 10)
+  },
 
   loadSettings ({ commit }) {
-    console.log(settings.file())
     commit('setIsRepeating', settings.get('playlist.repeat', false))
     commit('setIsShuffling', settings.get('playlist.shuffle', false))
     commit('setVolume', settings.get('playlist.volume', 100))
