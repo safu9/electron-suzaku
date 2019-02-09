@@ -179,7 +179,11 @@ const actions = {
     dispatch('updateIndex', state.index + 1)
   },
   prevSong ({ dispatch, state }) {
-    dispatch('updateIndex', state.index - 1)
+    if (state.audio && state.time >= 5) {
+      state.audio.currentTime = 0
+    } else {
+      dispatch('updateIndex', state.index - 1)
+    }
   },
   toggleRepeat ({ commit, state }) {
     if (state.isRepeating === true) {
