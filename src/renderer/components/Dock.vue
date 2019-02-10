@@ -7,9 +7,15 @@
       <div id="track-info">
         <div id="song-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</div>
         <div>
-          <span v-show="currentTrack.album">{{ currentTrack.album }}</span>
+          <router-link v-show="currentTrack.albumid"
+            :to="{ name: 'album', params: { id: currentTrack.albumid } }">
+            {{ currentTrack.album }}
+          </router-link>
           <span v-show="currentTrack.album && currentTrack.artist">/</span>
-          <span v-show="currentTrack.artist">{{ currentTrack.artist }}</span>
+          <router-link v-show="currentTrack.artistid"
+            :to="{ name: 'artist', params: { id: currentTrack.artistid } }">
+            {{ currentTrack.artist }}
+          </router-link>
         </div>
       </div>
     </div>
