@@ -4,9 +4,15 @@
       <img id="artwork" :src="currentTrack.picture ? ('file://' + currentTrack.picture) : 'static/blank.png'" />
       <p id="song-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</p>
       <p>
-        <span v-show="currentTrack.album">{{ currentTrack.album }}</span>
+        <router-link v-if="currentTrack.albumid"
+          :to="{ name: 'album', params: { id: currentTrack.albumid } }">
+          {{ currentTrack.album }}
+        </router-link>
         <span v-show="currentTrack.album && currentTrack.artist">/</span>
-        <span v-show="currentTrack.artist">{{ currentTrack.artist }}</span>
+        <router-link v-if="currentTrack.artistid"
+          :to="{ name: 'artist', params: { id: currentTrack.artistid } }">
+          {{ currentTrack.artist }}
+        </router-link>
       </p>
     </div>
 

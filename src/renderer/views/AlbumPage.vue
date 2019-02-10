@@ -4,7 +4,10 @@
       <img id="artwork" :src="album.picture ? ('file://' + album.picture) : 'static/blank.png'" />
       <p id="song-title">{{ album.album }}</p>
       <p>
-        <span v-show="album.artist">{{ album.albumartist || album.artist }}</span>
+        <router-link v-if="album.artistid"
+          :to="{ name: 'artist', params: { id: album.artistid } }">
+          {{ album.artist }}
+        </router-link>
       </p>
     </div>
 
