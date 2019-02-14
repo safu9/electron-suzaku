@@ -5,8 +5,8 @@
         <img class="artwork" :src="currentTrack.picture ? ('file://' + currentTrack.picture) : 'static/blank.png'" />
       </figure>
       <div id="track-info">
-        <div id="song-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</div>
-        <div>
+        <div id="track-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</div>
+        <div id="track-artist">
           <router-link v-if="currentTrack.albumid"
             :to="{ name: 'album', params: { id: currentTrack.albumid } }">
             {{ currentTrack.album }}
@@ -22,24 +22,24 @@
     <div id="dock-center">
       <div id="seekbar-wrap">
         <div id="current-index">{{ tracks.length ? index+1 : 0 }} / {{ tracks.length }}</div>
-        <Seekbar id="seekbar" color="#4fc08d"
+        <Seekbar id="seekbar" color="#ffa500"
           :max="currentTrack ? Math.round(currentTrack.duration) : 0"
           :value="time"
           @change="seekSong" />
         <div id="current-time">{{ timeString }} / {{ durationString }}</div>
       </div>
       <div id="controls">
-        <button id="repeat-button" @click="toggleRepeat" :class="{'off': !isRepeating}"><SvgIcon :icon="(isRepeating === 'one') ? 'repeat-one' : 'repeat'"></SvgIcon></button>
+        <button id="repeat-button" @click="toggleRepeat" :class="{'on': isRepeating}"><SvgIcon :icon="(isRepeating === 'one') ? 'repeat-one' : 'repeat'"></SvgIcon></button>
         <button id="prev-button" @click="prevSong"><SvgIcon icon="skip-backward"></SvgIcon></button>
         <button id="play-button" @click="togglePlay"><SvgIcon :icon="isPlaying ? 'pause' : 'play'"></SvgIcon></button>
         <button id="next-button" @click="nextSong"><SvgIcon icon="skip-forward"></SvgIcon></button>
-        <button id="shuffle-button" @click="toggleShuffle" :class="{'off': !isShuffling}"><SvgIcon icon="shuffle"></SvgIcon></button>
+        <button id="shuffle-button" @click="toggleShuffle" :class="{'on': isShuffling}"><SvgIcon icon="shuffle"></SvgIcon></button>
       </div>
     </div>
     <div id="dock-right">
       <SvgIcon id="volume-icon"
         :icon="'volume-' + (volume ? 'low' : 'mute')" />
-      <Seekbar id="volume-bar" color="#4fc08d"
+      <Seekbar id="volume-bar" color="#ffa500"
         :max="100"
         :value="volume"
         @change="changeVolume" />
@@ -131,6 +131,13 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
       }
+      #track-artist {
+        color: #ddd;
+
+        a:hover {
+          color: #eee;
+        }
+      }
     }
   }
 
@@ -165,24 +172,29 @@ export default {
       margin-bottom: 12px;
 
       button {
+        display: inline-block;
         padding: 0.5em;
-        border-radius: 2em;
+        margin: 0 0.5em;
 
         .icon {
           width: 1.5em;
           height: 1.5em;
+          fill: #ddd;
+        }
+        &:hover .icon {
+          fill: #fff;
+        }
+        &.on .icon {
+          fill: #E58F39;
+        }
+        &.on:hover .icon {
+          fill: #ffa500;
         }
       }
 
       #play-button {
-        background-color: #4fc08d;
-        &:hover {
-          background-color: rgba(79,192,141,.85);
-        }
-
-        .icon {
-          fill: #fff;
-        }
+        border: 1px solid #ddd;
+        border-radius: 2em;
       }
     }
   }
