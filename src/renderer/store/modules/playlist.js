@@ -1,3 +1,4 @@
+const fileUrl = require('file-url')
 const settings = require('electron-settings')
 
 const state = {
@@ -101,7 +102,9 @@ const actions = {
     }
 
     commit('setAudio', new Audio())
-    state.audio.src = path
+    state.audio.src = fileUrl(path)
+    // state.audio.src = url.pathToFileURL(path).href
+
     state.audio.onended = () => {
       dispatch('onSongEnded')
     }
