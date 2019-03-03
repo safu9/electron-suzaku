@@ -175,7 +175,7 @@ export default {
       margin: 0px;
       outline: none;
       overflow: hidden;
-      background: #f0f0f0;
+      background: #ddd;
       cursor: pointer;
       z-index: 0;
 

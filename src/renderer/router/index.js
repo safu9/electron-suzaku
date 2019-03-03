@@ -36,6 +36,11 @@ export default new Router({
       component: require('@/views/PlayerPage').default
     },
     {
+      path: '/lyrics',
+      name: 'lyrics',
+      component: require('@/views/LyricsPage').default
+    },
+    {
       path: '/settings',
       name: 'settings',
       component: require('@/views/SettingsPage').default

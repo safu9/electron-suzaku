@@ -5,7 +5,11 @@
         <img class="artwork" :src="currentTrack.picture ? ('file://' + currentTrack.picture) : 'static/blank.png'" />
       </figure>
       <div id="track-info">
-        <div id="track-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</div>
+        <div id="track-title">
+          <router-link :to="{ name: 'player' }">
+            {{ currentTrack.title || currentTrack.filename || 'Suzaku' }}
+          </router-link>
+        </div>
         <div id="track-artist">
           <router-link v-if="currentTrack.albumid"
             :to="{ name: 'album', params: { id: currentTrack.albumid } }">
@@ -37,6 +41,10 @@
       </div>
     </div>
     <div id="dock-right">
+      <router-link :to="{ name: 'lyrics' }" id="lyrics-button">
+        <SvgIcon id="lyrics-icon" icon="lyrics" />
+      </router-link>
+
       <SvgIcon id="volume-icon"
         :icon="'volume-' + (volume ? 'low' : 'mute')" />
       <Seekbar id="volume-bar" color="#ffa500"
@@ -205,8 +213,19 @@ export default {
     align-items: center;
     justify-content: center;
 
+    #lyrics-button {
+      font-size: 0;
+      margin: 4px;
+
+      #lyrics-icon {
+        fill: #ddd;
+        width: 0.9rem;
+        height: 0.9rem;
+      }
+    }
+
     #volume-icon {
-      fill: #fff;
+      fill: #ddd;
       width: 1.2rem;
       height: 1.2rem;
     }
