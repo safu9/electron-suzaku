@@ -97,9 +97,7 @@ const actions = {
     }
     const path = getters.currentTrack.path
 
-    if (state.audio) {
-      state.audio.pause()
-    }
+    dispatch('pause')
 
     commit('setAudio', new Audio())
     state.audio.src = fileUrl(path)
@@ -119,7 +117,7 @@ const actions = {
     state.audioGainNode.connect(state.audioContext.destination)
 
     if (startPlay) {
-      dispatch('togglePlay')
+      dispatch('play')
     } else {
       commit('setIsPlaying', false)
     }
@@ -136,25 +134,49 @@ const actions = {
       return
     }
 
-    if (!state.audio.paused) {
-      state.audio.pause()
-
-      window.clearInterval(state.timeIntervalID)
+    if (state.audio.paused) {
+      dispatch('play')
     } else {
-      state.audio.play()
-        .catch(err => {
-          console.log(err)
-          commit('setAudio', null)
-          commit('setIsPlaying', false)
-        })
-
-      const id = window.setInterval(() => {
-        dispatch('updateTime')
-      }, 200)
-      commit('setTimeIntervalID', id)
+      dispatch('pause')
+    }
+  },
+  play ({ dispatch, commit, state }) {
+    if (!state.audio || !state.audio.paused) {
+      return
     }
 
-    commit('setIsPlaying', !state.audio.paused)
+    commit('setIsPlaying', true)
+
+    const orgSrc = state.audio.src
+    state.audio.play()
+      .then(() => {
+        const id = window.setInterval(() => {
+          dispatch('updateTime')
+        }, 200)
+        commit('setTimeIntervalID', id)
+      })
+      .catch(err => {
+        console.error(err)
+
+        if (orgSrc === state.audio.src && state.isPlaying) {
+          state.audio.pause()
+          commit('setIsPlaying', false)
+        }
+      })
+  },
+  pause ({ dispatch, commit, state }) {
+    if (!state.audio || state.audio.paused) {
+      return
+    }
+
+    commit('setIsPlaying', false)
+
+    state.audio.pause()
+
+    if (state.timeIntervalID) {
+      window.clearInterval(state.timeIntervalID)
+      commit('setTimeIntervalID', null)
+    }
   },
   updateIndex ({ dispatch, commit, state }, index) {
     if (index < 0 || state.tracks.length <= index) {
@@ -165,8 +187,7 @@ const actions = {
         }
       } else {
         if (state.audio && state.isPlaying) {
-          state.audio.pause()
-          commit('setIsPlaying', false)
+          dispatch('pause')
         }
         return
       }
