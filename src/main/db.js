@@ -219,6 +219,10 @@ export default class {
 
   // Get data
 
+  getItem (id) {
+    return this.db.cfindOne({ _id: id })
+  }
+
   getTracks (query) {
     query.type = 'track'
     return this.db.cfind(query)

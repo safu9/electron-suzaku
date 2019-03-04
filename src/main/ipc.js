@@ -55,16 +55,16 @@ export default class {
     }
   }
 
-  async loadAlbum (_event, arg) {
+  async loadAlbum (_event, id) {
     try {
-      const albums = await this.db.getAlbums({ _id: arg }).exec()
-      if (!albums || albums.length === 0) {
+      const album = await this.db.getItem(id).exec()
+      if (!album || album.type !== 'album') {
         return
       }
 
       const data = {
-        album: albums[0],
-        tracks: await this.db.getTracks({ albumid: albums[0]._id }).sort({ track: 1 }).exec()
+        album: album,
+        tracks: await this.db.getTracks({ albumid: album._id }).sort({ track: 1 }).exec()
       }
 
       this.renderer.send('album_loaded', data)
@@ -73,26 +73,22 @@ export default class {
     }
   }
 
-  async loadArtist (_event, arg) {
+  async loadArtist (_event, id) {
     try {
-      let artists = await this.db.getAlbumArtists({ _id: arg }).exec()
-      let data
+      const artist = await this.db.getItem(id).exec()
+      if (!artist) {
+        return
+      }
 
-      if (artists && artists.length) {
-        data = {
-          artist: artists[0],
-          albums: await this.db.getAlbums({ artistid: artists[0]._id }).exec()
-        }
+      const data = {
+        artist: artist
+      }
+      if (artist.type === 'albumartist') {
+        data.albums = await this.db.getAlbums({ artistid: artist._id }).exec()
+      } else if (artist.type === 'artist') {
+        data.albums = await this.db.getAlbums({ artistids: artist._id }).exec()
       } else {
-        artists = await this.db.getArtists({ _id: arg }).exec()
-        if (!artists || artists.length === 0) {
-          return
-        }
-
-        data = {
-          artist: artists[0],
-          albums: await this.db.getAlbums({ artistids: artists[0]._id }).exec()
-        }
+        return
       }
 
       this.renderer.send('artist_loaded', data)
