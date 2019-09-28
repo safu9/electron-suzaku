@@ -1,5 +1,4 @@
 const fileUrl = require('file-url')
-const settings = require('electron-settings')
 
 const state = {
   targetID: null,
@@ -130,17 +129,19 @@ const actions = {
     }
   },
   togglePlay ({ dispatch, commit, state }) {
-    if (!state.audio) {
-      return
-    }
-
-    if (state.audio.paused) {
+    if (!state.audio || state.audio.paused) {
       dispatch('play')
     } else {
       dispatch('pause')
     }
   },
   play ({ dispatch, commit, state }) {
+    if (!state.audio) {
+      dispatch('initPlayer', false)
+      if (state.audio) {
+        state.audio.currentTime = state.time
+      }
+    }
     if (!state.audio || !state.audio.paused) {
       return
     }
@@ -217,8 +218,6 @@ const actions = {
     } else {
       commit('setIsRepeating', true)
     }
-
-    settings.set('playlist.repeat', state.isRepeating)
   },
   toggleShuffle ({ commit, state }) {
     commit('setIsShuffling', !state.isShuffling)
@@ -229,8 +228,6 @@ const actions = {
       commit('setIndex', state.shuffleList[state.index])
       commit('clearShuffleList')
     }
-
-    settings.set('playlist.shuffle', state.isShuffling)
   },
   updateTime ({ commit, state }) {
     if (state.audio) {
@@ -241,19 +238,12 @@ const actions = {
   },
   changeVolume ({ commit }, volume) {
     commit('setVolume', volume)
-    settings.set('playlist.volume', state.volume)
   },
   turnUp ({ dispatch, state }) {
     dispatch('changeVolume', state.volume + 10)
   },
   turnDown ({ dispatch, state }) {
     dispatch('changeVolume', state.volume - 10)
-  },
-
-  loadSettings ({ commit }) {
-    commit('setIsRepeating', settings.get('playlist.repeat', false))
-    commit('setIsShuffling', settings.get('playlist.shuffle', false))
-    commit('setVolume', settings.get('playlist.volume', 100))
   }
 }
 

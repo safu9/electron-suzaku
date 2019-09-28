@@ -18,16 +18,12 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 import Dock from '@/components/Dock'
 
 export default {
   name: 'suzaku',
   components: {
     Dock
-  },
-  beforeMount () {
-    this.loadPlaylistSettings()
   },
   mounted () {
     this.$electron.ipcRenderer.on('menu_clicked', this.menuClicked)
@@ -43,8 +39,6 @@ export default {
     this.$electron.ipcRenderer.off('menu_clicked', this.menuClicked)
   },
   methods: {
-    ...mapActions('playlist', { loadPlaylistSettings: 'loadSettings' }),
-
     menuClicked (_event, id) {
       switch (id) {
         case 'settings':
