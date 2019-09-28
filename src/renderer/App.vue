@@ -79,12 +79,13 @@ export default {
 }
 
 #main {
-  background:
-    radial-gradient(
-      ellipse at top left,
-      rgba(255, 255, 255, 1) 40%,
-      rgba(229, 229, 229, .9) 100%
-    );
+  // background:
+  //   radial-gradient(
+  //     ellipse at top left,
+  //     rgba(255, 255, 255, 1) 40%,
+  //     rgba(229, 229, 229, .9) 100%
+  //   );
+  background: #fefefe;
   flex: 1;
   width: 100%;
   display: flex;

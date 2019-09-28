@@ -45,3 +45,20 @@ button {
   cursor: pointer;
   background: none;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background: #dbdbdb;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:active {
+  border-width: 1px;
+}
