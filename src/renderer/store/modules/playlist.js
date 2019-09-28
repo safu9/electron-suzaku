@@ -112,7 +112,7 @@ const actions = {
       commit('setVolume', state.volume)
     }
 
-    let source = state.audioContext.createMediaElementSource(state.audio)
+    const source = state.audioContext.createMediaElementSource(state.audio)
     source.connect(state.audioGainNode)
     state.audioGainNode.connect(state.audioContext.destination)
 

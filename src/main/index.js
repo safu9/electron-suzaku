@@ -15,7 +15,7 @@ if (!isDevelopment) {
 
 let mainWindow
 const winURL = isDevelopment
-  ? `http://localhost:9080`
+  ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`
 
 function createWindow () {
@@ -124,7 +124,7 @@ function createWindow () {
     })
   }
 
-  let appMenu = Menu.buildFromTemplate(template)
+  const appMenu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(appMenu)
 }
 

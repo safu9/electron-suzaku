@@ -160,7 +160,7 @@ export default class {
         continue
       }
 
-      let album = newAlbums.find(i => (i.album === track.album)) || await this.db.findOne({ type: 'album', album: track.album })
+      const album = newAlbums.find(i => (i.album === track.album)) || await this.db.findOne({ type: 'album', album: track.album })
       if (album) {
         if (!album.artistids) {
           album.artistids = [track.artistid]
