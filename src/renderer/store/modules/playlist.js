@@ -166,13 +166,11 @@ const actions = {
       })
   },
   pause ({ dispatch, commit, state }) {
-    if (!state.audio || state.audio.paused) {
-      return
-    }
-
     commit('setIsPlaying', false)
 
-    state.audio.pause()
+    if (state.audio) {
+      state.audio.pause()
+    }
 
     if (state.timeIntervalID) {
       window.clearInterval(state.timeIntervalID)
@@ -187,8 +185,10 @@ const actions = {
           commit('updateShuffleList')
         }
       } else {
-        if (state.audio && state.isPlaying) {
+        if (state.isPlaying) {
           dispatch('pause')
+          commit('setAudio', null)
+          commit('setTime', 0)
         }
         return
       }
