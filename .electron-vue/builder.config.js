@@ -25,13 +25,14 @@ const builderConfig = {
     ]
   },
   'mac': {
-    'icon': 'build/icons/icon.icns'
+    'icon': 'icons/icon.icns'
   },
   'win': {
-    'icon': 'build/icons/icon.ico'
+    'icon': 'icons/icon.ico'
   },
   'linux': {
-    'icon': 'build/icons'
+    'category': 'Audio',
+    'icon': 'icons'
   }
 }
 

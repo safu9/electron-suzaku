@@ -3,8 +3,8 @@
 process.env.NODE_ENV = 'production'
 
 const chalk = require('chalk')
-const del = require('del')
 const builder = require('electron-builder')
+const rimraf = require('rimraf')
 const webpack = require('webpack')
 const Multispinner = require('multispinner')
 
@@ -16,19 +16,12 @@ const doneLog = chalk.bgGreen.white(' DONE ') + ' '
 const errorLog = chalk.bgRed.white(' ERROR ') + ' '
 const okayLog = chalk.bgBlue.white(' OKAY ') + ' '
 
-if (process.env.BUILD_TARGET === 'clean') clean()
-else build()
 
-function clean () {
-  del.sync(['build/*', '!build/icons', '!build/icons/icon.*'])
-  console.log(`\n${doneLog}\n`)
-  process.exit()
-}
+build()
 
 function build () {
   console.log(chalk.yellow.bold('starting build...') + '\n')
-
-  del.sync(['dist/*', '!.gitkeep'])
+  rimraf.sync('dist')
 
   const tasks = ['main', 'renderer']
   const m = new Multispinner(tasks, {

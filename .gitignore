@@ -1,9 +1,8 @@
 .DS_Store
 thumbs.db
 
-dist/*
-build/*
-!build/icons
+dist/
+build/
 
 node_modules/
 

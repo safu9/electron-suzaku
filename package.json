@@ -7,7 +7,7 @@
   "main": "./dist/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js",
-    "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
+    "build:clean": "rimraf build",
     "dev": "node .electron-vue/dev-runner.js",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue --fix src",
@@ -36,7 +36,6 @@
     "copy-webpack-plugin": "^4.6.0",
     "cross-env": "^5.1.6",
     "css-loader": "^2.1.0",
-    "del": "^3.0.0",
     "devtron": "^1.4.0",
     "electron": "^6.0.10",
     "electron-builder": "^20.19.2",
