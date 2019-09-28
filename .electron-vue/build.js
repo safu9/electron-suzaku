@@ -4,11 +4,13 @@ process.env.NODE_ENV = 'production'
 
 const chalk = require('chalk')
 const del = require('del')
+const builder = require('electron-builder')
 const webpack = require('webpack')
 const Multispinner = require('multispinner')
 
 const mainConfig = require('./webpack.main.config')
 const rendererConfig = require('./webpack.renderer.config')
+const builderConfig = require('./builder.config')
 
 const doneLog = chalk.bgGreen.white(' DONE ') + ' '
 const errorLog = chalk.bgRed.white(' ERROR ') + ' '
@@ -36,16 +38,9 @@ function build () {
 
   let results = ''
 
-  m.on('success', () => {
-    process.stdout.write('\x1B[2J\x1B[0f')
-    console.log(`\n\n${results}`)
-    console.log(`${okayLog} starting ${chalk.yellow('electron-builder')}...\n`)
-    process.exit()
-  })
-
   pack(mainConfig).then(result => {
-    results += result + '\n\n'
     m.success('main')
+    results += result + '\n\n'
   }).catch(err => {
     m.error('main')
     console.log(`\n  ${errorLog}failed to build main process`)
@@ -54,13 +49,23 @@ function build () {
   })
 
   pack(rendererConfig).then(result => {
-    results += result + '\n\n'
     m.success('renderer')
+    results += result + '\n\n'
   }).catch(err => {
     m.error('renderer')
     console.log(`\n  ${errorLog}failed to build renderer process`)
     console.error(`\n${err}\n`)
     process.exit(1)
+  })
+
+  m.on('success', () => {
+    console.log(`\n\n${results}`)
+    console.log(`${okayLog} starting ${chalk.yellow('electron-builder')}...\n`)
+
+    builder.build({config: builderConfig}).then(result => {
+      console.log(`\n${doneLog} build complete!`)
+      result.forEach(file => console.log(file))
+    })
   })
 }
 
