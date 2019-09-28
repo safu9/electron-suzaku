@@ -54,6 +54,7 @@ export default {
   },
   methods: {
     ...mapActions('playlist', [
+      'play',
       'setTarget',
       'setCurrentIndex',
       'togglePlay'
@@ -73,13 +74,14 @@ export default {
         this.togglePlay()
       } else if (this.targetID === this.album._id) {
         this.setCurrentIndex(index)
+        this.play()
       } else {
         this.setTarget({
           targetID: this.album._id,
           tracks: this.tracks,
           index: index
         })
-        this.togglePlay()
+        this.play()
       }
     }
   }
