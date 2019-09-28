@@ -136,7 +136,7 @@ let rendererConfig = {
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-    path: path.join(__dirname, '../dist/electron')
+    path: path.join(__dirname, '../dist')
   },
   resolve: {
     alias: {
@@ -169,7 +169,7 @@ if (process.env.NODE_ENV === 'production') {
     new CopyWebpackPlugin([
       {
         from: path.join(__dirname, '../static'),
-        to: path.join(__dirname, '../dist/electron/static'),
+        to: path.join(__dirname, '../dist/static'),
         ignore: ['.*']
       }
     ]),
