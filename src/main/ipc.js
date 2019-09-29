@@ -1,7 +1,9 @@
 import { app, ipcMain } from 'electron'
 import DB from './db'
 
+const { fork } = require('child_process')
 const settings = require('electron-settings')
+const path = require('path')
 
 export default class {
   constructor (renderer) {
@@ -99,8 +101,26 @@ export default class {
 
   async scanDirs (event) {
     const dirs = settings.get('core.dirs')
-    await this.db.scanDirs(dirs)
+    for (const dir of dirs) {
+      await this.scanDir(dir)
+    }
     this.loadData(event)
+  }
+
+  scanDir (dir) {
+    return new Promise((resolve, reject) => {
+      const scanProcess = fork(path.join(__dirname, 'scan'), [this.db.basepath, dir])
+      scanProcess.on('message', (message) => {
+        if (message.progress) {
+          this.renderer.send('scan_progress', message.progress)
+        } else if (message.err) {
+          console.log(message.err)
+        }
+      })
+      scanProcess.on('exit', (code) => {
+        resolve()
+      })
+    })
   }
 
   openSettings (_event) {

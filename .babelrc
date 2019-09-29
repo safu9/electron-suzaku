@@ -4,7 +4,7 @@
     "main": {
       "presets": [
         ["@babel/preset-env", {
-          "targets": { "node": 7 }
+          "targets": { "node": 10 }
         }]
       ]
     },
@@ -15,13 +15,6 @@
         }]
       ]
     },
-    "web": {
-      "presets": [
-        ["@babel/preset-env", {
-          "modules": false
-        }]
-      ]
-    }
   },
   "plugins": ["@babel/plugin-transform-runtime"]
 }

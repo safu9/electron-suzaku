@@ -8,7 +8,8 @@ const webpack = require('webpack')
 
 let mainConfig = {
   entry: {
-    main: path.join(__dirname, '../src/main/index.js')
+    main: path.join(__dirname, '../src/main/index.js'),
+    scan: path.join(__dirname, '../src/main/scan.js'),
   },
   externals: [
     ...Object.keys(dependencies || {})
@@ -35,8 +36,8 @@ let mainConfig = {
     ]
   },
   node: {
-    __dirname: process.env.NODE_ENV !== 'production',
-    __filename: process.env.NODE_ENV !== 'production'
+    __dirname: false, // process.env.NODE_ENV !== 'production',
+    __filename: false // process.env.NODE_ENV !== 'production'
   },
   output: {
     filename: '[name].js',
