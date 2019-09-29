@@ -6,13 +6,14 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+const electron = require('electron')
 const { app } = require('electron').remote
 
 
 init()
 
 async function init () {
-  Vue.use(require('vue-electron'))
+  Vue.prototype.$electron = electron
 
   Vue.prototype.$t = await i18next
     .use(i18nextBackend)
@@ -29,7 +30,6 @@ async function init () {
 
   Vue.config.productionTip = false
 
-  /* eslint-disable no-new */
   new Vue({
     components: { App },
     router,
