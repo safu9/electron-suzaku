@@ -23,42 +23,38 @@ function build () {
   console.log(chalk.yellow.bold('starting build...') + '\n')
   rimraf.sync('dist')
 
-  const tasks = ['main', 'renderer']
-  const m = new Multispinner(tasks, {
-    preText: 'building',
-    postText: 'process'
-  })
+  const configs = {
+    main: mainConfig,
+    renderer: rendererConfig
+  }
+
+  const m = new Multispinner(['main', 'renderer'], {preText: 'build', postText: 'process'})
 
   let results = ''
 
-  pack(mainConfig).then(result => {
-    m.success('main')
-    results += result + '\n\n'
-  }).catch(err => {
-    m.error('main')
-    console.log(`\n  ${errorLog}failed to build main process`)
-    console.error(`\n${err}\n`)
-    process.exit(1)
-  })
+  const packProcess = async (name) => {
+    try {
+      const result = await pack(configs[name])
+      m.success(name)
+      results += result + '\n\n'
+    } catch (err) {
+      m.error(name)
+      console.log(`\n  ${errorLog}failed to build ${name} process`)
+      console.error(`\n${err}\n`)
+      process.exit(1)
+    }
+  }
 
-  pack(rendererConfig).then(result => {
-    m.success('renderer')
-    results += result + '\n\n'
-  }).catch(err => {
-    m.error('renderer')
-    console.log(`\n  ${errorLog}failed to build renderer process`)
-    console.error(`\n${err}\n`)
-    process.exit(1)
-  })
+  packProcess('main')
+  packProcess('renderer')
 
-  m.on('success', () => {
+  m.on('success', async () => {
     console.log(`\n\n${results}`)
     console.log(`${okayLog} starting ${chalk.yellow('electron-builder')}...\n`)
 
-    builder.build({config: builderConfig}).then(result => {
-      console.log(`\n${doneLog} build complete!`)
-      result.forEach(file => console.log(file))
-    })
+    const result = await builder.build({config: builderConfig})
+    console.log(`\n${doneLog} build complete!`)
+    result.forEach(file => console.log('  ' + file))
   })
 }
 
@@ -66,8 +62,9 @@ function pack (config) {
   return new Promise((resolve, reject) => {
     config.mode = 'production'
     webpack(config, (err, stats) => {
-      if (err) reject(err.stack || err)
-      else if (stats.hasErrors()) {
+      if (err) {
+        reject(err.stack || err)
+      } else if (stats.hasErrors()) {
         let err = ''
 
         stats
