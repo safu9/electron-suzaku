@@ -1,9 +1,9 @@
 name: build
 
-on:
-  push:
-    tags:
-      - v*
+on: push
+  # push:
+  #   tags:
+  #     - v*
 
 jobs:
   build:
@@ -18,13 +18,15 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 10.x
-    - name: yarn install and build
-      run: |
-        yarn
-        yarn build
-        yarn rimraf "build/!(*.AppImage|*.snap|*.exe|*.dmg)"
+    - name: Install dependencies
+      run: yarn
+    - name: Build
+      run: yarn build
       env:
         CI: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Cleanup artifacts
+      run: yarn rimraf "build/!(*.AppImage|*.snap|*.exe|*.dmg)"
     - uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.os }}
