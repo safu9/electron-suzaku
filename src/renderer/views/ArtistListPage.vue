@@ -1,7 +1,7 @@
 <template>
   <div id="artist-list-page">
     <div class="clearfix">
-      <p id="title">Artists</p>
+      <p id="title">{{ $t('artists') }}</p>
     </div>
 
     <hr>

@@ -4,13 +4,14 @@ import { app, BrowserWindow, Menu } from 'electron'
 import IPC from './ipc'
 
 const path = require('path')
+const i18next = require('i18next')
+const i18nextBackend = require('i18next-node-fs-backend')
+
 
 const isDevelopment = (process.env.NODE_ENV === 'development')
 
-/**
- * Set `__static` path to static files in production
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
- */
+// Set `__static` path to static files in production
+// https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
 if (!isDevelopment) {
   global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
@@ -20,10 +21,7 @@ const winURL = isDevelopment
   ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`
 
-function createWindow () {
-  /**
-   * Initial window options
-   */
+async function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
     title: 'Suzaku',
@@ -53,58 +51,69 @@ function createWindow () {
   const ipc = new IPC(mainWindow.webContents)
   ipc.init()
 
+  const t = await i18next.use(i18nextBackend).init({
+    lng: app.getLocale(),
+    fallbackLng: 'en',
+    ns: ['main'],
+    defaultNS: 'main',
+    backend: {
+      loadPath: path.join(__static, 'locales/{{lng}}/{{ns}}.json'),
+      addPath: path.join(__static, 'locales/{{lng}}/{{ns}}.missing.json')
+    }
+  })
+
   const onMenuClick = (item, browserWindow, event) => {
     browserWindow.webContents.send('menu_clicked', item.id)
   }
   const template = [
     {
-      label: 'File',
+      label: t('file'),
       submenu: [
         {
           id: 'settings',
-          label: 'Settings',
+          label: t('settings'),
           accelerator: 'CmdOrCtrl + ,',
           click: onMenuClick
         },
         { type: 'separator' },
         {
-          label: 'Quit',
+          label: t('quit'),
           accelerator: 'CmdOrCtrl + Q',
           click () { app.quit() }
         }
       ]
     },
     {
-      label: 'Play',
+      label: t('play'),
       submenu: [
         {
           id: 'play',
-          label: 'Play / Pause',
+          label: t('play_pause'),
           accelerator: 'Space',
           click: onMenuClick
         },
         {
           id: 'next',
-          label: 'Next',
+          label: t('next'),
           accelerator: 'CmdOrCtrl + Right',
           click: onMenuClick
         },
         {
           id: 'previous',
-          label: 'Previous',
+          label: t('previous'),
           accelerator: 'CmdOrCtrl + Left',
           click: onMenuClick
         },
         { type: 'separator' },
         {
           id: 'turnUp',
-          label: 'Turn Up',
+          label: t('turn_up'),
           accelerator: 'CmdOrCtrl + Up',
           click: onMenuClick
         },
         {
           id: 'turnDown',
-          label: 'Turn Down',
+          label: t('turn_down'),
           accelerator: 'CmdOrCtrl + Down',
           click: onMenuClick
         }
@@ -114,7 +123,7 @@ function createWindow () {
 
   if (isDevelopment) {
     template.push({
-      label: 'Dev',
+      label: t('dev'),
       submenu: [
         { role: 'reload' },
         { role: 'forcereload' },
@@ -146,6 +155,7 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
 
 /**
  * Auto Updater

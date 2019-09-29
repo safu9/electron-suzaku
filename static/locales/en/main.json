@@ -1,0 +1,14 @@
+{
+  "file": "&File",
+  "settings": "Settings",
+  "quit": "Quit",
+
+  "play": "&Play",
+  "play_pause": "Play / Pause",
+  "next": "Next",
+  "previous": "Previous",
+  "turn_up": "Turn Up",
+  "turn_down": "Turn Down",
+
+  "dev": "&Dev"
+}

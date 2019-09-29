@@ -52,7 +52,7 @@
       <CircleProgress
         :style="{visibility: isLoading ? 'visible' : 'hidden'}"
         :percent="loadingProgress"
-        title="ロード中..." />
+        :title="$t('loading')" />
     </div>
   </div>
 </template>

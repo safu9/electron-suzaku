@@ -1,12 +1,12 @@
 <template>
   <div id="settings-page">
     <div class="clearfix">
-      <p id="title">Settings</p>
+      <p id="title">{{ $t('settings') }}</p>
     </div>
 
     <hr>
 
-    <label>Library folders</label>
+    <label>{{ $t('library_folders') }}</label>
     <div id="folder">
       <div v-for="dir in dirs" :key="dir"
         class="listitem" @click="removeFolder(dir)">
@@ -15,7 +15,7 @@
       </div>
       <div class="listitem" @click="addFolder">
         <SvgIcon icon="add" />
-        <span class="item-name">Add folder</span>
+        <span class="item-name">{{ $t('add_folder') }}</span>
       </div>
     </div>
   </div>
