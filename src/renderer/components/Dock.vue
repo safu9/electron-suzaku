@@ -98,7 +98,7 @@ export default {
   },
   mounted () {
     this.$electron.ipcRenderer.on('scan_progress', this.onScanProgress)
-    this.$electron.ipcRenderer.on('data_loaded', this.onScanComplete)
+    this.$electron.ipcRenderer.on('scan_complete', this.onScanComplete)
   },
   methods: {
     ...mapActions('playlist', [

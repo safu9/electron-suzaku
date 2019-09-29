@@ -105,7 +105,7 @@ export default class {
       await this.scanDir(dir)
     }
     this.db.init()      // reload database
-    this.loadData(event)
+    this.renderer.send('scan_complete')
   }
 
   scanDir (dir) {
