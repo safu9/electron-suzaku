@@ -1,9 +1,7 @@
 <template>
   <div id="dock">
     <div id="dock-left">
-      <figure class="artwork-wrap">
-        <img class="artwork" :src="currentTrack.picture ? ('file://' + currentTrack.picture) : 'static/blank.png'" />
-      </figure>
+      <Artwork :picture="currentTrack.picture"/>
       <div id="track-info">
         <div id="track-title">
           <router-link :to="{ name: 'player' }">
@@ -61,16 +59,18 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
+import Artwork from '@/components/Artwork'
+import CircleProgress from '@/components/CircleProgress'
 import Seekbar from '@/components/Seekbar'
 import SvgIcon from '@/components/SvgIcon'
-import CircleProgress from '@/components/CircleProgress'
 
 export default {
   props: [],
   components: {
+    Artwork,
+    CircleProgress,
     Seekbar,
-    SvgIcon,
-    CircleProgress
+    SvgIcon
   },
   data () {
     return {
@@ -139,15 +139,11 @@ export default {
     display: flex;
     align-items: center;
 
-    .artwork-wrap {
+    .artwork {
       width: 50px;
       height: 50px;
       margin: 0 6px 0 12px;
-    }
-    .artwork {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+      padding: 0;
     }
 
     #track-info {

@@ -1,7 +1,7 @@
 <template>
   <div id="lyrics-page">
     <div class="clearfix">
-      <img id="artwork" :src="currentTrack.picture ? ('file://' + currentTrack.picture) : 'static/blank.png'" />
+      <Artwork :picture="currentTrack.picture"/>
       <p id="song-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</p>
       <p>
         <router-link v-if="currentTrack.albumid"
@@ -25,10 +25,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Artwork from '@/components/Artwork'
 
 export default {
   name: 'lyrics-page',
-  components: {},
+  components: {
+    Artwork
+  },
   data () {
     return {}
   },
@@ -57,11 +60,11 @@ export default {
 
 <style lang="scss">
 #lyrics-page {
-  #artwork {
+  .artwork {
     width: 100px;
     height: 100px;
     margin-right: 20px;
-    object-fit: contain;
+    padding: 0;
     float: left;
   }
   #song-title {

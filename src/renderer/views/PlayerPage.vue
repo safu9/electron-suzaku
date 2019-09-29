@@ -1,7 +1,7 @@
 <template>
   <div id="player-page">
     <div class="clearfix">
-      <img id="artwork" :src="currentTrack.picture ? ('file://' + currentTrack.picture) : 'static/blank.png'" />
+      <Artwork :picture="currentTrack.picture"/>
       <p id="song-title">{{ currentTrack.title || currentTrack.filename || 'Suzaku' }}</p>
       <p>
         <router-link v-if="currentTrack.albumid"
@@ -30,11 +30,13 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
+import Artwork from '@/components/Artwork'
 import SvgIcon from '@/components/SvgIcon'
 
 export default {
   name: 'player-page',
   components: {
+    Artwork,
     SvgIcon
   },
   data () {
@@ -61,11 +63,11 @@ export default {
 
 <style lang="scss">
 #player-page {
-  #artwork {
+  .artwork {
     width: 100px;
     height: 100px;
     margin-right: 20px;
-    object-fit: contain;
+    padding: 0;
     float: left;
   }
   #song-title {

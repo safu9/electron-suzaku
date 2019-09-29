@@ -8,10 +8,8 @@
 
     <div id="album-list">
       <router-link v-for="album in albums" :key="album._id"
-         :to="{ name: 'album', params: { id: album._id }}" class="listitem">
-        <figure class="item-artwork-wrap">
-          <img class="item-artwork" :src="album.picture ? ('file://' + album.picture) : 'static/blank.png'" />
-        </figure>
+        :to="{ name: 'album', params: { id: album._id }}" class="listitem">
+        <Artwork :picture="album.picture"/>
         <div class="item-name">{{ album.album }}</div>
       </router-link>
     </div>
@@ -19,9 +17,12 @@
 </template>
 
 <script>
+import Artwork from '@/components/Artwork'
+
 export default {
   name: 'artist-page',
   components: {
+    Artwork
   },
   data () {
     return {
@@ -75,18 +76,6 @@ export default {
       width: 20%;
     }
 
-    .item-artwork-wrap {
-      position: relative;
-      width: 100%;
-      height: 0;
-      padding-bottom: 100%;
-    }
-    .item-artwork {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
     .item-name {
       padding: .2rem;
       vertical-align: middle;
