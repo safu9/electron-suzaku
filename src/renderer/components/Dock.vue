@@ -51,6 +51,10 @@
         :max="100"
         :value="volume"
         @change="changeVolume" />
+      <CircleProgress
+        :style="{visibility: isLoading ? 'visible' : 'hidden'}"
+        :percent="loadingProgress"
+        title="ロード中..." />
     </div>
   </div>
 </template>
@@ -59,12 +63,20 @@
 import { mapState, mapGetters, mapActions } from 'vuex'
 import Seekbar from '@/components/Seekbar'
 import SvgIcon from '@/components/SvgIcon'
+import CircleProgress from '@/components/CircleProgress'
 
 export default {
   props: [],
   components: {
     Seekbar,
-    SvgIcon
+    SvgIcon,
+    CircleProgress
+  },
+  data () {
+    return {
+      isLoading: false,
+      loadingProgress: 0
+    }
   },
   computed: {
     ...mapState('playlist', [
@@ -84,6 +96,10 @@ export default {
       'durationString'
     ])
   },
+  mounted () {
+    this.$electron.ipcRenderer.on('scan_progress', this.onScanProgress)
+    this.$electron.ipcRenderer.on('data_loaded', this.onScanComplete)
+  },
   methods: {
     ...mapActions('playlist', [
       'togglePlay',
@@ -98,6 +114,13 @@ export default {
       if (this.audio) {
         this.audio.currentTime = val
       }
+    },
+    onScanProgress (_event, progress) {
+      this.loadingProgress = progress
+      this.isLoading = true
+    },
+    onScanComplete (_event) {
+      this.isLoading = false
     }
   }
 }
