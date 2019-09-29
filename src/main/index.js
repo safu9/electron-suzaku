@@ -3,6 +3,8 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import IPC from './ipc'
 
+const path = require('path')
+
 const isDevelopment = (process.env.NODE_ENV === 'development')
 
 /**
@@ -10,7 +12,7 @@ const isDevelopment = (process.env.NODE_ENV === 'development')
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (!isDevelopment) {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+  global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
 let mainWindow
@@ -24,6 +26,8 @@ function createWindow () {
    */
   mainWindow = new BrowserWindow({
     show: false,
+    title: 'Suzaku',
+    icon: path.join(__static, 'logo.png'),
     backgroundColor: '#fff',
     width: 1000,
     height: 550,
