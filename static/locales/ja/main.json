@@ -1,0 +1,14 @@
+{
+  "file": "ファイル(&F)",
+  "settings": "設定",
+  "quit": "終了",
+
+  "play": "再生(&P)",
+  "play_pause": "再生 / 一時停止",
+  "next": "次へ",
+  "previous": "前へ",
+  "turn_up": "音量を上げる",
+  "turn_down": "音量を下げる",
+
+  "dev": "開発(&D)"
+}

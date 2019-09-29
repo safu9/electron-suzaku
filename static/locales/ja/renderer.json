@@ -1,0 +1,12 @@
+{
+  "top": "トップ",
+  "artists": "アーティスト",
+  "albums": "アルバム",
+  "playing": "再生中",
+  "settings": "設定",
+
+  "loading": "ロード中...",
+
+  "library_folders": "ライブラリフォルダ",
+  "add_folder": "フォルダを追加"
+}

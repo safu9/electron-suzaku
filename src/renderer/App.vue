@@ -5,7 +5,7 @@
         <router-link :to="{ name: 'top' }">{{ $t('top') }}</router-link>
         <router-link :to="{ name: 'artist-list' }">{{ $t('artists') }}</router-link>
         <router-link :to="{ name: 'album-list' }">{{ $t('albums') }}</router-link>
-        <router-link :to="{ name: 'player' }">{{ $t('player') }}</router-link>
+        <router-link :to="{ name: 'player' }">{{ $t('playing') }}</router-link>
         <router-link :to="{ name: 'settings' }">{{ $t('settings') }}</router-link>
       </div>
 
