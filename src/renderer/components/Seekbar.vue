@@ -3,8 +3,7 @@
     <div
       class="slider-container"
       :class="{ 'animating': !activated, 'disabled': disabled }"
-      :style="{ '--slider-color': this.color }">
-
+      :style="{ '--slider-color': color }">
       <div
         ref="slider"
         class="slider"
@@ -13,14 +12,14 @@
         @mousedown="onClickSlider($event)">
         <div
           class="slider-line"
-          :style="{ width: `${this.percent}%` }">
+          :style="{ width: `${percent}%` }">
         </div>
       </div>
       <div
         ref="circle"
         class="slider-circle"
         :disabled="disabled"
-        :style="{ left: `${this.percent}%` }"
+        :style="{ left: `${percent}%` }"
         @touchstart="activateListners()"
         @mousedown="activateListners()">
       </div>

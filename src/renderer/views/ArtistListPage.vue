@@ -7,7 +7,7 @@
     <hr/>
 
     <router-link v-for="artist in artists" :key="artist._id"
-       :to="{ name: 'artist', params: { id: artist._id }}" class="listitem">
+      :to="{ name: 'artist', params: { id: artist._id }}" class="listitem">
       <span class="item-name">{{ artist.artist }}</span>
     </router-link>
   </div>
@@ -15,7 +15,6 @@
 
 <script>
 export default {
-  name: 'artist-list-page',
   components: {
   },
   data () {

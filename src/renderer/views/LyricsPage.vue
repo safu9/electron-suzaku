@@ -28,7 +28,6 @@ import { mapGetters } from 'vuex'
 import Artwork from '@/components/Artwork'
 
 export default {
-  name: 'lyrics-page',
   components: {
     Artwork
   },

@@ -28,7 +28,6 @@ const { dialog } = require('electron').remote
 const settings = require('electron-settings')
 
 export default {
-  name: 'settings-page',
   components: {
     SvgIcon
   },

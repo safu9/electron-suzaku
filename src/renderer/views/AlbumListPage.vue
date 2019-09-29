@@ -20,7 +20,6 @@
 import Artwork from '@/components/Artwork'
 
 export default {
-  name: 'album-list-page',
   components: {
     Artwork
   },

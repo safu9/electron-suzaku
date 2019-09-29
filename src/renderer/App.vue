@@ -21,7 +21,6 @@
 import Dock from '@/components/Dock'
 
 export default {
-  name: 'suzaku',
   components: {
     Dock
   },

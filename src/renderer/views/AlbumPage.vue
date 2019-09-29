@@ -13,7 +13,8 @@
 
     <hr/>
 
-    <p v-for="(track, i) in tracks" :key="track._id" class="listitem" @click="playTrack(i)">
+    <p v-for="(track, i) in tracks" :key="track._id"
+      class="listitem" @click="playTrack(i)">
       <span v-if="track._id === currentTrack._id" class="item-index item-index-playing">
         <SvgIcon :icon="isPlaying ? 'play' : 'pause'" />
       </span>
@@ -29,7 +30,6 @@ import Artwork from '@/components/Artwork'
 import SvgIcon from '@/components/SvgIcon'
 
 export default {
-  name: 'album-page',
   components: {
     Artwork,
     SvgIcon

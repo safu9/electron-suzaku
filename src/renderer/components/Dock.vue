@@ -65,7 +65,6 @@ import Seekbar from '@/components/Seekbar'
 import SvgIcon from '@/components/SvgIcon'
 
 export default {
-  props: [],
   components: {
     Artwork,
     CircleProgress,
