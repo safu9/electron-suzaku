@@ -24,10 +24,15 @@ jobs:
       run: yarn build
       env:
         CI: true
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Cleanup artifacts
       run: yarn rimraf "build/!(*.AppImage|*.snap|*.exe|*.dmg)"
     - uses: actions/upload-artifact@v1
       with:
         name: ${{ matrix.os }}
         path: build
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
