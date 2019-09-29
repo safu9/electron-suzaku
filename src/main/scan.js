@@ -1,7 +1,5 @@
 // Run in child process
 
-'use strict'
-
 import DB from './db'
 
 const crypto = require('crypto')
