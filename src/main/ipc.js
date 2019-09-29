@@ -66,7 +66,7 @@ export default class {
 
       const data = {
         album: album,
-        tracks: await this.db.getTracks({ albumid: album._id }).sort({ track: 1 }).exec()
+        tracks: await this.db.getTracks({ albumid: album._id }).sort({ 'disk.no': 1, track: 1 }).exec()
       }
 
       this.renderer.send('album_loaded', data)
