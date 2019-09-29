@@ -3,7 +3,8 @@
     <img
       :class="['artwork-img', {'artwork-img_loaded': isLoaded}]"
       :src="src"
-      @load="isLoaded = true" />
+      @load="isLoaded = true"
+      @error="isError = true" />
   </figure>
 </template>
 
@@ -12,12 +13,18 @@ export default {
   props: ['picture'],
   data () {
     return {
-      isLoaded: false
+      isLoaded: false,
+      isError: false
     }
   },
   computed: {
     src () {
-      return this.picture ? ('file://' + this.picture) : 'static/blank.png'
+      return this.picture && !this.isError ? ('file://' + this.picture) : 'static/blank.png'
+    }
+  },
+  watch: {
+    picture (newVal, oldVal) {
+      this.isLoaded = this.isError = false
     }
   }
 }
