@@ -1,4 +1,5 @@
 # Suzaku
+[![Actions Status](https://github.com/safu9/electron-suzaku/workflows/test/badge.svg)](https://github.com/safu9/electron-suzaku/actions)
 
 Simple cross-platform music player & library manager
 
