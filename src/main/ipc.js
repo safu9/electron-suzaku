@@ -104,6 +104,7 @@ export default class {
     for (const dir of dirs) {
       await this.scanDir(dir)
     }
+    this.db.init()      // reload database
     this.loadData(event)
   }
 

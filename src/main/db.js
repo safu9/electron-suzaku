@@ -1,11 +1,15 @@
 const path = require('path')
 const Datastore = require('nedb-promise')
 
+
 export default class {
   constructor (basepath) {
     this.basepath = basepath
+    this.init()
+  }
 
-    const filepath = path.join(basepath, 'data', 'data.db')
+  init () {
+    const filepath = path.join(this.basepath, 'data', 'data.db')
     this.db = Datastore({ filename: filepath, autoload: true })
     this.db.ensureIndex({ fieldName: 'path', unique: true, sparse: true })
   }
