@@ -16,7 +16,7 @@
       </p>
     </div>
 
-    <hr>
+    <hr/>
 
     <p v-if="lyrics" id="lyrics">{{ lyrics }}</p>
     <p v-else id="no-lyrics">No lyrics</p>

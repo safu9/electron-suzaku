@@ -4,14 +4,14 @@
       <p id="song-title">Suzaku</p>
     </div>
 
-    <hr>
+    <hr/>
 
     <router-link v-for="artist in artists" :key="artist._id"
        :to="{ name: 'artist', params: { id: artist._id }}" class="listitem">
       <span class="item-name">{{ artist.artist }}</span>
     </router-link>
 
-    <hr>
+    <hr/>
 
     <router-link v-for="album in albums" :key="album._id"
        :to="{ name: 'album', params: { id: album._id }}" class="listitem">

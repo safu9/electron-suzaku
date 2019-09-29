@@ -4,7 +4,7 @@
       <p id="title">{{ $t('artists') }}</p>
     </div>
 
-    <hr>
+    <hr/>
 
     <router-link v-for="artist in artists" :key="artist._id"
        :to="{ name: 'artist', params: { id: artist._id }}" class="listitem">

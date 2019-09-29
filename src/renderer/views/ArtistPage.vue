@@ -4,7 +4,7 @@
       <p id="title">{{ artist.artist }}</p>
     </div>
 
-    <hr>
+    <hr/>
 
     <div id="album-list">
       <router-link v-for="album in albums" :key="album._id"

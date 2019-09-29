@@ -4,7 +4,7 @@
       <p id="title">{{ $t('settings') }}</p>
     </div>
 
-    <hr>
+    <hr/>
 
     <label>{{ $t('library_folders') }}</label>
     <div id="folder">

@@ -16,7 +16,7 @@
       </p>
     </div>
 
-    <hr>
+    <hr/>
 
     <p v-for="(track, i) in tracks" :key="track.path" class="listitem" @click="setCurrentIndex(i)">
       <span v-if="track._id === currentTrack._id" class="item-index item-index-playing">
