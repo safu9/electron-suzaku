@@ -32,42 +32,35 @@ async function scanDir (db, dir) {
   let progress = 0
   let progressPercent = 0
 
-  const newTracks = (await Promise.all(
-    files
-      .map(async (filePath) => {
-        const timestamp = fs.statSync(filePath).mtimeMs
-        const doc = await db.findOne({ path: filePath })
-        if (doc) {
-          if (doc.timestamp === timestamp) {
-            return null
-          } else {
-            await db.remove({ path: filePath })
-          }
-        }
+  const newTracks = []
+  for (const filePath of files) {
+    const timestamp = fs.statSync(filePath).mtimeMs
+    const doc = await db.findOne({ path: filePath })
+    if (doc) {
+      if (doc.timestamp === timestamp) {
+        continue
+      } else {
+        await db.remove({ path: filePath })
+      }
+    }
 
-        try {
-          const track = await parseFile(filePath)
-          track.type = 'track'
-          track.path = filePath
-          track.filename = path.parse(filePath).name
-          track.timestamp = timestamp
-          return track
-        } catch (err) {
-          process.send({ err: err.message })
-          return null
-        }
-      })
-      .map((task) => {
-        return task.then((result) => {
-          const newPercent = Math.floor(++progress / progressTotal * 100)
-          if (progressPercent !== newPercent) {
-            progressPercent = newPercent
-            process.send({ progress: newPercent })
-          }
-          return result
-        })
-      })
-  )).filter((track) => track)
+    try {
+      const track = await parseFile(filePath)
+      track.type = 'track'
+      track.path = filePath
+      track.filename = path.parse(filePath).name
+      track.timestamp = timestamp
+      newTracks.push(track)
+    } catch (err) {
+      process.send({ err: err.message })
+    }
+
+    const newPercent = Math.floor(++progress / progressTotal * 100)
+    if (progressPercent !== newPercent) {
+      progressPercent = newPercent
+      process.send({ progress: newPercent })
+    }
+  }
 
   // Create list of new albums
 
