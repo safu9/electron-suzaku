@@ -43,6 +43,7 @@ export default {
 
       this.artist = data.artist
       this.albums = data.albums
+      this.$root.$emit('restore_scroll')
     }
   }
 }

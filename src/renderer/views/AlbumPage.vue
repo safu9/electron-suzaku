@@ -69,6 +69,7 @@ export default {
 
       this.album = data.album
       this.tracks = data.tracks
+      this.$root.$emit('restore_scroll')
     },
 
     playTrack (index) {

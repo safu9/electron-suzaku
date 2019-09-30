@@ -35,6 +35,7 @@ export default {
       }
 
       this.artists = data.artists
+      this.$root.$emit('restore_scroll')
     }
   }
 }

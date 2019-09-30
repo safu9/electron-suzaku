@@ -9,7 +9,7 @@
         <router-link :to="{ name: 'settings' }">{{ $t('settings') }}</router-link>
       </div>
 
-      <div id="library">
+      <div id="library" ref="library">
         <router-view></router-view>
       </div>
     </div>
@@ -24,6 +24,11 @@ export default {
   components: {
     Dock
   },
+  data () {
+    return {
+      scrollPositions: {}
+    }
+  },
   mounted () {
     this.$electron.ipcRenderer.on('menu_clicked', this.menuClicked)
 
@@ -31,6 +36,23 @@ export default {
       if (e.key === ' ') {
         e.preventDefault()
         this.$store.dispatch('playlist/togglePlay')
+      }
+    })
+
+    this.$router.afterEach((to, from) => {
+      // Save scroll position
+      if (this.$refs.library.scrollTop) {
+        this.scrollPositions[from.path] = this.$refs.library.scrollTop
+      }
+
+      // Restore scroll position when needed
+      if (to.path in this.scrollPositions && this.scrollPositions[to.path]) {
+        const scroll = this.scrollPositions[to.path]
+        this.$root.$once('restore_scroll', () => {
+          this.$nextTick(() => {
+            this.$refs.library.scrollTop = scroll
+          })
+        })
       }
     })
   },
