@@ -46,9 +46,6 @@ async function createWindow () {
     mainWindow = null
   })
 
-  const ipc = new IPC(mainWindow.webContents)
-  ipc.init()
-
   const t = await i18next.use(i18nextBackend).init({
     lng: app.getLocale(),
     fallbackLng: 'en',
@@ -59,6 +56,9 @@ async function createWindow () {
       addPath: path.join(__static, 'locales/{{lng}}/{{ns}}.missing.json')
     }
   })
+
+  const ipc = new IPC(mainWindow.webContents, t)
+  ipc.init()
 
   const onMenuClick = (item, browserWindow, event) => {
     browserWindow.webContents.send('menu_clicked', item.id)

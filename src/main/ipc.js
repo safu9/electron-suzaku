@@ -6,9 +6,16 @@ const settings = require('electron-settings')
 const path = require('path')
 
 export default class {
-  constructor (renderer) {
+  constructor (renderer, t) {
     this.db = new DB(app.getPath('userData'))
     this.renderer = renderer
+
+    this.compilationArtist = {
+      _id: this.db.compilationID,
+      type: 'albumartist',
+      artist: t('compilation'),      // i18next
+      artistsort: ''
+    }
   }
 
   init () {
@@ -51,6 +58,10 @@ export default class {
         artists: await this.db.getAlbumArtists({}).exec()
       }
 
+      if (await this.db.hasCompilation()) {
+        data.artists.unshift(this.compilationArtist)
+      }
+
       this.renderer.send('artist_list_loaded', data)
     } catch (err) {
       console.log(err.message)
@@ -77,6 +88,14 @@ export default class {
 
   async loadArtist (_event, id) {
     try {
+      if (id === this.db.compilationID) {
+        this.renderer.send('artist_loaded', {
+          artist: this.compilationArtist,
+          albums: await this.db.getCompilationAlbums().exec()
+        })
+        return
+      }
+
       const artist = await this.db.getItem(id).exec()
       if (!artist) {
         return

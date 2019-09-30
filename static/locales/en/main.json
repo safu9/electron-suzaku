@@ -10,5 +10,7 @@
   "turn_up": "Turn Up",
   "turn_down": "Turn Down",
 
-  "dev": "&Dev"
+  "dev": "&Dev",
+
+  "compilation": "Compilation"
 }

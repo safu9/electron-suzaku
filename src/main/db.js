@@ -5,6 +5,8 @@ const Datastore = require('nedb-promise')
 export default class {
   constructor (basepath) {
     this.basepath = basepath
+    this.compilationID = 'compilation'
+
     this.init()
   }
 
@@ -38,6 +40,16 @@ export default class {
   getAlbumArtists (query) {
     query.type = 'albumartist'
     return this.db.cfind(query).sort({ artistsort: 1 })
+  }
+
+  // Compilation
+
+  hasCompilation () {
+    return this.db.ccount({ type: 'album', artistid: this.compilationID }).exec()
+  }
+
+  getCompilationAlbums () {
+    return this.getAlbums({ artistid: this.compilationID })
   }
 
   clean () {
