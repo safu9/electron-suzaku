@@ -123,9 +123,9 @@ async function createWindow () {
     template.push({
       label: t('dev'),
       submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
+        { role: 'reload', accelerator: 'F5' },
+        { role: 'forcereload', accelerator: 'Shift + F5' },
+        { role: 'toggledevtools', accelerator: 'F12' },
         { type: 'separator' },
         { role: 'resetzoom' },
         { role: 'zoomin' },
