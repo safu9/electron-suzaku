@@ -12,7 +12,9 @@ const path = require('path')
 const basepath = process.argv[2]
 const dir = process.argv[3]
 
-const db = (new DB(basepath)).db
+const instance = new DB(basepath)
+const db = instance.db
+const compilationID = instance.compilationID
 
 scanDir(db, dir)
 
@@ -81,9 +83,19 @@ async function scanDir (db, dir) {
       album = { type: 'album' }
       album.album = track.album
       album.albumsort = (track.albumsort || album.album || '').toLowerCase()
-      album.artist = track.albumartist || track.artist
-      album.artistsort = (track.albumartistsort || track.artistsort || album.artist || '').toLowerCase()
+      album.artist = track.albumartist
+      album.artistsort = (track.albumartistsort || album.artist || album.artist || '').toLowerCase()
       album.picture = track.picture
+
+      if (!track.compilation) {
+        album.artist = album.artist || track.artist
+        album.artistsort = (album.artistsort || track.artistsort || '').toLowerCase()
+      } else {
+        album.artistid = compilationID
+        album.artist = ''
+        album.artistsort = ''
+      }
+
       newAlbums.push(album)
     }
   }
