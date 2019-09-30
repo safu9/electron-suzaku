@@ -1,38 +1,38 @@
 // config for electron-builder
 
 const builderConfig = {
-  'productName': 'suzaku',
-  'appId': 'net.safu9.suzaku',
-  'directories': {
-    'output': 'build'
+  productName: 'suzaku',
+  appId: 'net.safu9.suzaku',
+  directories: {
+    output: 'build'
   },
-  'files': [
+  files: [
     'dist/**/*'
   ],
-  'dmg': {
-    'contents': [
+  dmg: {
+    contents: [
       {
-        'x': 410,
-        'y': 150,
-        'type': 'link',
-        'path': '/Applications'
+        x: 410,
+        y: 150,
+        type: 'link',
+        path: '/Applications'
       },
       {
-        'x': 130,
-        'y': 150,
-        'type': 'file'
+        x: 130,
+        y: 150,
+        type: 'file'
       }
     ]
   },
-  'mac': {
-    'icon': 'icons/icon.icns'
+  mac: {
+    icon: 'icons/icon.icns'
   },
-  'win': {
-    'icon': 'icons/icon.ico'
+  win: {
+    icon: 'icons/icon.ico'
   },
-  'linux': {
-    'category': 'Audio',
-    'icon': 'icons'
+  linux: {
+    category: 'Audio',
+    icon: 'icons'
   }
 }
 

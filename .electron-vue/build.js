@@ -28,7 +28,7 @@ function build () {
     renderer: rendererConfig
   }
 
-  const m = new Multispinner(['main', 'renderer'], {preText: 'build', postText: 'process'})
+  const m = new Multispinner(['main', 'renderer'], { preText: 'build', postText: 'process' })
 
   let results = ''
 
@@ -52,7 +52,7 @@ function build () {
     console.log(`\n\n${results}`)
     console.log(`${okayLog} starting ${chalk.yellow('electron-builder')}...\n`)
 
-    const result = await builder.build({config: builderConfig, publish: 'never'})
+    const result = await builder.build({ config: builderConfig, publish: 'never' })
     console.log(`\n${doneLog} build complete!`)
     result.forEach(file => console.log('  ' + file))
   })

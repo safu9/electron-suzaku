@@ -6,10 +6,10 @@ const path = require('path')
 const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 
-let mainConfig = {
+const mainConfig = {
   entry: {
     main: path.join(__dirname, '../src/main/index.js'),
-    scan: path.join(__dirname, '../src/main/scan.js'),
+    scan: path.join(__dirname, '../src/main/scan.js')
   },
   externals: [
     ...Object.keys(dependencies || {})
@@ -59,7 +59,7 @@ let mainConfig = {
 if (process.env.NODE_ENV !== 'production') {
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
-      '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+      __static: `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
     })
   )
 }
