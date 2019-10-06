@@ -1,8 +1,8 @@
 // config for electron-builder
 
 const builderConfig = {
-  productName: 'suzaku',
-  appId: 'net.safu9.suzaku',
+  productName: 'Suzaku',
+  appId: 'dev.safu9.suzaku',
   directories: {
     output: 'build'
   },

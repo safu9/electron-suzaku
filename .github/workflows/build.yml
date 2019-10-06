@@ -25,6 +25,7 @@ jobs:
       run: yarn build
       env:
         CI: true
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Cleanup artifacts
       run: yarn rimraf "build/!(*.AppImage|*.snap|*.exe|*.dmg)"
     - uses: actions/upload-artifact@v1

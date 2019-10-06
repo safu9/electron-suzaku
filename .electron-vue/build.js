@@ -52,7 +52,7 @@ function build () {
     console.log(`\n\n${results}`)
     console.log(`${okayLog} starting ${chalk.yellow('electron-builder')}...\n`)
 
-    const result = await builder.build({ config: builderConfig, publish: 'never' })
+    const result = await builder.build({ config: builderConfig })
     console.log(`\n${doneLog} build complete!`)
     result.forEach(file => console.log('  ' + file))
   })
