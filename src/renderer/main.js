@@ -6,6 +6,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+const path = require('path')
 const electron = require('electron')
 const { app } = require('electron').remote
 
@@ -23,8 +24,8 @@ async function init () {
       ns: ['renderer'],
       defaultNS: 'renderer',
       backend: {
-        loadPath: 'static/locales/{{lng}}/{{ns}}.json',
-        addPath: 'static/locales/{{lng}}/{{ns}}.missing.json'
+        loadPath: path.join(__static, 'locales/{{lng}}/{{ns}}.json'),
+        addPath: path.join(__static, 'locales/{{lng}}/{{ns}}.missing.json')
       }
     })
 
