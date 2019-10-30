@@ -1,6 +1,7 @@
 # Suzaku
 [![Actions Status](https://github.com/safu9/electron-suzaku/workflows/test/badge.svg)](https://github.com/safu9/electron-suzaku/actions)
 [![GitHub release](https://img.shields.io/github/v/release/safu9/electron-suzaku)](https://github.com/safu9/electron-suzaku/releases)
+[![Dependencies Status](https://david-dm.org/safu9/electron-suzaku/status.svg)](https://david-dm.org/safu9/electron-suzaku)
 
 Simple cross-platform music player & library manager
 
