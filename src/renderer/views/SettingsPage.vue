@@ -18,6 +18,10 @@
         <span class="item-name">{{ $t('add_folder') }}</span>
       </div>
     </div>
+
+    <button @click="scanLibrary" :disabled="isScannig">
+      {{ $t('rescan_library') }}
+    </button>
   </div>
 </template>
 
@@ -34,15 +38,17 @@ export default {
   data () {
     return {
       dirs: settings.get('core.dirs', []),
-      changed: {}
+      changed: {},
+      isScannig: false
     }
   },
   mounted () {
+    this.$electron.ipcRenderer.on('scan_complete', this.onScanComplete)
   },
   beforeDestroy () {
     if (this.changed.dirs) {
       settings.set('core.dirs', this.dirs)
-      this.$electron.ipcRenderer.send('scan_dirs')
+      this.scanLibrary()
     }
   },
   methods: {
@@ -57,6 +63,13 @@ export default {
     removeFolder (dir) {
       this.dirs = this.dirs.filter(i => i !== dir)
       this.changed.dirs = true
+    },
+    scanLibrary () {
+      this.isScannig = true
+      this.$electron.ipcRenderer.send('scan_dirs')
+    },
+    onScanComplete () {
+      this.isScannig = false
     }
   }
 }
@@ -94,6 +107,17 @@ export default {
 
     .item-name {
       vertical-align: middle;
+    }
+  }
+
+  button {
+    padding: 0.5em;
+    margin: 1em 0;
+    border: 1px solid #ddd;
+    border-radius: .2em;
+
+    &:disabled {
+      cursor: default;
     }
   }
 }

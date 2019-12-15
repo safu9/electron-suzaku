@@ -8,5 +8,6 @@
   "loading": "Loading...",
 
   "library_folders": "Library folders",
-  "add_folder": "Add folder"
+  "add_folder": "Add folder",
+  "rescan_library": "Rescan library"
 }
