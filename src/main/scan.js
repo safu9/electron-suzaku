@@ -215,7 +215,7 @@ async function readFiles (basePath) {
 }
 
 async function parseFile (filePath) {
-  const metadata = await mm.parseFile(filePath, { native: true })
+  const metadata = await mm.parseFile(filePath)
 
   if (metadata.common.picture) {
     const pic = metadata.common.picture[0]

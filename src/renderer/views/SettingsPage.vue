@@ -52,13 +52,14 @@ export default {
     }
   },
   methods: {
-    addFolder () {
-      dialog.showOpenDialog({ properties: ['openDirectory'] }, async (dirs) => {
-        if (dirs && !this.dirs.includes(dirs[0])) {
-          this.dirs.push(dirs[0])
-          this.changed.dirs = true
-        }
-      })
+    async addFolder () {
+      const result = await dialog.showOpenDialog({ properties: ['openDirectory'] })
+      const dirs = result && result.filePaths
+
+      if (dirs && !this.dirs.includes(dirs[0])) {
+        this.dirs.push(dirs[0])
+        this.changed.dirs = true
+      }
     },
     removeFolder (dir) {
       this.dirs = this.dirs.filter(i => i !== dir)
